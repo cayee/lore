@@ -11,30 +11,18 @@
 </head>
 <body>
 <div>
-    <input type="checkbox" onchange="selectTrack(this)" checked="true"/>Save my Q&A for future training purposes
+    <input type="checkbox" onchange="selectTrack(this)" checked="true"/>
+    Save my Q&A for future training purposes
 </div>
 <div>
     <select id="modelSelect" onchange="changeModel(this)">
         <option>AWS Titan</option>
     </select>
 </div>
-<table id="chat" style="display: block; max-height: 300px; overflow-y: scroll"><tbody>
-    <tr>
-        <td>bot</td>
-        <td>Ask me anyhting about The Lore!</td>
-        <td></td>
-    </tr>
-</tbody></table>
-<div>
-    <input type="text" id="query"></input>
-    <button onclick="ask()">Ask</button>
-    <img id="hourglass" src="ico/favicon-16x16.png" style="display: none">
-</div>
 
-<div id="chatDiv">
-<div hidden>
-<div style="width: 300px">
-    <div class="message" id="msgYou">
+<div id="chatDiv" style="width: 300px; max-height: 300px; overflow-y: scroll">
+    <div hidden>
+    <div class="message" id="msgBot">
         <div class="message__outer" style="flex-direction: row-reverse">
             <div class="message__avatar">
                 <img class="avatar" src="ico/favicon-32x32.png" width="28" height="28">
@@ -45,9 +33,7 @@
             <div class="message__status"></div>
         </div>
     </div>
-</div>
-<div style="width: 300px">
-    <div class="message" id="msgBot">
+    <div class="message" id="msgYou">
         <div class="message__outer" style="flex-direction: row">
             <div class="message__avatar">
                 <img class="avatar" src="ico/favicon-32x32.png" width="28" height="28">
@@ -58,9 +44,15 @@
             <div class="message__status"></div>
         </div>
     </div>
+    </div>
 </div>
+
+<div>
+    <input type="text" id="query"></input>
+    <button onclick="ask()">Ask</button>
+    <img id="hourglass" src="ico/favicon-16x16.png" style="display: none">
 </div>
-</div>
+
 <script src="lore.js"></script>
 </body>
 </html>

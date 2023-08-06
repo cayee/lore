@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lore PoC Authorizer</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+Done!
+<script>
+    let params = new URLSearchParams(window.location.search);
+    window.opener.getToken(params.get("code"));
+    window.close();
+</script>
+</body>
+</html>

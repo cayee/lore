@@ -1,39 +1,91 @@
 const userQuery   = document.querySelector("#query");
 const hourglass   = document.querySelector("#hourglass");
-const chatTable   = document.querySelector("#chat");
-const chatDiv   = document.querySelector("#chatDiv");
+const chat   = document.querySelector("#chatDiv");
 const msgBot   = document.querySelector("#msgBot");
 const msgYou   = document.querySelector("#msgYou");
 
-const COL_BOT = 0;
-const COL_MSG = 1;
-const COL_YOU = 2;
-
-const botMsgStyle = "";
-const youMsgStyle = "";
-function insertRow(tbl, lft, msg, rgt) {
-
-    let body = tbl.children[0];
-    let row = body.children[0].cloneNode(true);
-    row.children[COL_MSG].textContent = msg;
-    if (lft === null) { // question
-        row.children[COL_BOT].textContent = "";
-        row.children[COL_YOU].textContent = rgt;
-        row.style = youMsgStyle;
-    }
-    else {
-        row.children[COL_BOT].textContent = lft;
-        row.children[COL_YOU].textContent = "";
-        row.style = botMsgStyle;
-    }
-    body.appendChild(row);
+function insertMsg(node, msg) {
+    let msgNode = node.cloneNode(true);
+    msgNode.children[0].children[1].children[0].textContent = msg;
+    chat.appendChild(msgNode);
+    msgNode.scrollIntoView(true);
 }
+
+let jwtCognito = null;
 function ask() {
-    hourglass.style.display = "inline";
     const question = userQuery.value;
-    insertRow(chatTable, null, question, "me");
-    //TODO - ask model
-    answer = "Not ready";
-    insertRow(chatTable, "bot", answer, null);
-    hourglass.style.display = "none";
+    if (question.length < 1) return;
+
+    if (jwtCognito === null) authenticate("ask", "email");    //TODO - fetch from Model select
+    else {
+        hourglass.style.display = "inline";
+        insertMsg(msgBot, question);
+
+        callAsk(question, function() {
+            let answer = `Not ready ${this.status}`;
+            if (this.status === 403 || this.status === 401) {
+                jwtCognito = null;
+                answer = `Not allowed ${this.status}`;  //TODO
+            } else if (this.status === 200) {
+                let response = JSON.parse(this.response);
+                answer = response.body;  //TODO
+            }
+            else if (this.status === 429) {
+                rateLimit();
+                answer = "Rate limited";
+            }
+
+            hourglass.style.display = "none";
+            insertMsg(msgYou, answer);
+        });
+    }
+}
+
+function callAsk(msg, callback){
+    let request = new XMLHttpRequest();
+    request.open('GET', "https://lore-poc.pwlkrz.people.aws.dev/AskLore", true);
+    request.setRequestHeader("Authorization", jwtCognito);
+    //request.withCredentials = true;
+    request.onload = callback;
+    request.send();
+}
+
+function callToken(code, callback){
+    let request = new XMLHttpRequest();
+    request.open('GET', "https://lore-poc.pwlkrz.people.aws.dev/token?code=" + code, true);
+    //request.withCredentials = true;
+    request.onload = callback;
+    request.send();
+}
+
+function getToken(code){
+    if (code.length !== 36) return;
+
+    callToken(code, function() {
+        //TODO - does it save the header?
+        if (this.status === 200) {
+            let response = JSON.parse(this.response);
+            jwtCognito = response.headers.Authorization;
+            authOK();
+        } else {
+            jwtCognito = null;
+        }
+    });
+}
+function authOK(){
+    //TODO rateLimitIcon.style.display = 'none';
+    ask();  //ask again - it is the only place where auth is called
+}
+
+function rateLimit() {
+    //TODO
+}
+
+function authenticate(state, scope){
+    const appAuthz = "lore-poc";
+    const region = "us-east-2";
+    const cognitoUrl = "amazoncognito.com";
+    const clientId = "38accif6oi0h7knsvjnflgbnti";
+    const redirect_uri = "http://localhost:5055/reload.html"
+    window.open(`https://${appAuthz}.auth.${region}.${cognitoUrl}/oauth2/authorize?client_id=${clientId}&response_type=code&scope=${scope}&redirect_uri=${redirect_uri}`);
 }
