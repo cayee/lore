@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "Beaufort for LOL";
+    src: url('./fonts/BeaufortForLoL-TTF/BeaufortforLOL-Bold.ttf') format("Truetype");
+}
+
 .message__outer {
     display: flex;
 }
@@ -9,8 +14,32 @@
     max-width: calc(100% - 67px);
     overflow-wrap: break-word;
     border-end-end-radius: 4px;
+    padding-left: 3px;
+    padding-right: 3px;
+    margin-bottom: 3px;
 }
 .message__avatar {
     padding-left: 6px;
     padding-right: 8px;
+}
+
+body {
+    background-color: rgba(1,10,19);
+    font-family: "Beaufort for LOL", Arial, sans-serif;
+    color: #f0e6d2;
+}
+
+#MainH {
+    font-family: "Beaufort for LOL";
+    color: #f0e6d2;
+}
+
+#QuestionP {
+    font-family: "Beaufort for LOL", Arial, sans-serif;
+    color: #c8aa6e;
+}
+
+input[type=text]
+{
+    font-size: 16px;
 }

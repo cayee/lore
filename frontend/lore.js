@@ -4,9 +4,12 @@ const chat   = document.querySelector("#chatDiv");
 const msgBot   = document.querySelector("#msgBot");
 const msgYou   = document.querySelector("#msgYou");
 
-function insertMsg(node, msg) {
+function insertMsg(node, msg, user=false) {
     let msgNode = node.cloneNode(true);
     msgNode.children[0].children[1].children[0].textContent = msg;
+    if (user == true) {
+        msgNode.children[0].children[0].children[0].src = "ico/Icon" + iconOption + ".webp";
+    }
     chat.appendChild(msgNode);
     msgNode.scrollIntoView(true);
 }
@@ -19,7 +22,7 @@ function ask() {
     if (jwtCognito === null) authenticate("ask", "email");    //TODO - fetch from Model select
     else {
         hourglass.style.display = "inline";
-        insertMsg(msgBot, question);
+        insertMsg(msgBot, question, true);
 
         callAsk(question, function() { //TODO pass whether to save the question
             let answer = `Not ready ${this.status}`;
@@ -93,3 +96,10 @@ function authenticate(state, scope){
     const redirect_uri = hostName + "reload.html";
     window.open(`https://${appAuthz}.auth.${region}.${cognitoUrl}/oauth2/authorize?client_id=${clientId}&response_type=code&scope=${scope}&redirect_uri=${redirect_uri}`);
 }
+
+document.getElementById("query").addEventListener("keydown", function(e) {
+    // Enter is pressed
+    if (e.code == "Enter") { 
+        document.getElementById("AskQButton").click()
+     }
+}, false);
