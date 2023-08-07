@@ -18,17 +18,15 @@ def app() -> None:
 
     # Choose tool
     current_tool = st.selectbox(
-        "Choose Tool:", ["AWS Well Architected Tool", "Code Generation Tool"]
+        "Choose Tool:", ["Loremaster"]
     )
 
     query = st.text_input("Query:")
 
     if st.button("Submit Query"):
         with st.spinner("Generating..."):
-            if current_tool == "AWS Well Architected Tool":
+            if current_tool == "Loremaster":
                 answer = well_arch_tool(query)
-            elif current_tool == "Code Generation Tool":
-                answer = code_gen_tool(query)
 
             if type(answer) == dict:
                 st.markdown(answer["ans"])
@@ -52,7 +50,7 @@ def main() -> None:
     """
 
     # Start the streamlit app
-    st.title("Bedrock Tools")
+    st.title("League of Legends Loremaster")
 
     app()
 
