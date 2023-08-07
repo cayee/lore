@@ -1,0 +1,16 @@
+.message__outer {
+    display: flex;
+}
+.message__inner {
+    flex: 1;
+    display: flex;
+}
+.message__bubble {
+    max-width: calc(100% - 67px);
+    overflow-wrap: break-word;
+    border-end-end-radius: 4px;
+}
+.message__avatar {
+    padding-left: 6px;
+    padding-right: 8px;
+}

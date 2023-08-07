@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>Lore PoC</title>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" type="text/css" href="lore.css">
+</head>
+<body>
+<div>
+    <input type="checkbox" checked="true"/>
+    Save my Q&A for future training purposes
+</div>
+<div>
+    <select id="modelSelect" onchange="changeModel(this)">
+        <option>AWS Titan</option>
+    </select>
+</div>
+
+<div id="chatDiv" style="width: 300px; max-height: 300px; overflow-y: scroll">
+    <div hidden>
+    <div class="message" id="msgBot">
+        <div class="message__outer" style="flex-direction: row-reverse">
+            <div class="message__avatar">
+                <img class="avatar" src="ico/favicon-32x32.png" width="28" height="28">
+            </div>
+            <div class="message__inner" style="flex-direction: row-reverse">
+                <div class="message__bubble" style="background-color: lightskyblue">Hello!</div>
+            </div>
+            <div class="message__status"></div>
+        </div>
+    </div>
+    <div class="message" id="msgYou">
+        <div class="message__outer" style="flex-direction: row">
+            <div class="message__avatar">
+                <img class="avatar" src="ico/favicon-32x32.png" width="28" height="28">
+            </div>
+            <div class="message__inner">
+                <div class="message__bubble" style="background-color: lightyellow">Veeery loong text about anything but nothing else!</div>
+            </div>
+            <div class="message__status"></div>
+        </div>
+    </div>
+    </div>
+</div>
+
+<div>
+    <input type="text" id="query"></input>
+    <button onclick="ask()">Ask</button>
+    <img id="hourglass" src="ico/favicon-16x16.png" style="display: none">
+</div>
+
+<script src="lore.js"></script>
+</body>
+</html>
