@@ -39,6 +39,14 @@ body {
     color: #c8aa6e;
 }
 
+#AskQButton {
+    height: 38px; width: 38px; vertical-align: middle; background-color: #221E1F; border-color: #221E1F
+}
+
+#query {
+    height: 32px; width: 242px; vertical-align: middle; background-color: #221E1F; border-color: #221E1F; color: #f0e6d2
+}
+
 input[type=text]
 {
     font-size: 16px;
