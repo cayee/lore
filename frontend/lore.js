@@ -31,7 +31,7 @@ function ask() {
                 answer = `Not allowed ${this.status}`;  //TODO
             } else if (this.status === 200) {
                 let response = JSON.parse(this.response);
-                answer = response.body;  //TODO
+                answer = JSON.parse(response.body).answer;
             }
             else if (this.status === 429) {
                 rateLimit();
@@ -48,7 +48,7 @@ const hostName = "https://lore-poc.pwlkrz.people.aws.dev/"
 const apiHostName = hostName+"ai/"
 function callAsk(msg, callback){
     let request = new XMLHttpRequest();
-    request.open('GET', apiHostName+"AskLore", true);
+    request.open('GET', apiHostName+"AskLore?query="+msg, true);
     request.setRequestHeader("X-Authorization", jwtCognito);
     //request.withCredentials = true;
     request.onload = callback;
