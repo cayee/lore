@@ -56,31 +56,45 @@ def getDocs(query, bedrock):
 def lambda_handler(event, context):
 
     if not "query" in event:
-        return {
-            'statusCode': 400,
-            'body': "Ask a question, please!"
-        }
+        if 'queryStringParameters' not in event or 'query' not in event['queryStringParameters']:
+            return {
+                'statusCode': 400,
+                'body': "Ask a question, please!"
+            }
+        query = event['queryStringParameters']["query"]
+    else:
+        query = event["query"]
 
-    query = event["query"]
+
     print("query: ", query)
+
+    queries = query.split("_")
+    if len(queries) == 1:
+        queries = ["Use the following pieces of context to answer the question at the end.",
+                   f"""
+
+            Question: {query}
+            Answer:"""]
 
     bedrock = connectToBedrock()
 
     # Find docs
-    docs = getDocs(query, bedrock)
     context = ""
-
     doc_sources_string = ""
-    for doc in docs:
-        # doc_sources_string += doc.metadata["source"] + "\n"
-        context += doc.page_content
 
-    prompt = f"""Use the following pieces of context to answer the question at the end.
+    for query in queries[:-2]:
+        docs = getDocs(query, bedrock)
+        for doc in docs:
+            # doc_sources_string += doc.metadata["source"] + "\n"
+            context += doc.page_content
+
+    #prompt = f"""Use the following pieces of context to answer the question at the end.
+    prompt = f"""{queries[-2]}
 
     {context}
-
-    Question: {query}
-    Answer:"""
+    
+    {queries[-1]}
+    """
 
     generated_text = call_bedrock(bedrock, prompt)
 
