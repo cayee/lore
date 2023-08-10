@@ -20,10 +20,11 @@ with open(FILENAME, 'r') as f:
     championInfo = json.load(f)
 
 texts = championInfo["list"]
+metadatas = championInfo["meta"]
 
 be = BedrockEmbeddings()
 be.client = bedrock
-be.embed_documents(texts)
+#be.embed_documents(texts)
 
-docsearch = FAISS.from_texts(texts, be)
+docsearch = FAISS.from_texts(texts, be, metadatas=metadatas)
 docsearch.save_local('index_faiss')
