@@ -1,13 +1,22 @@
+def lambda_handler(event, context):
+    return {
+        'statusCode': 200,
+        'headers': {'Content-Type': 'text/html; charset=utf-8'},
+        'body': page
+    }
+
+page = """
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
     <title>Lore PoC</title>
     <meta charset="utf-8" />
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="ico/LOL_Icon_Rendered_Hi-Res-NoRing.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="ico/LOL_Icon_Rendered_Hi-Res-NoRing.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../ico/LOL_Icon_Rendered_Hi-Res-NoRing.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../ico/LOL_Icon_Rendered_Hi-Res-NoRing.png">
     <link rel="manifest" href="site.webmanifest">
-    <link rel="stylesheet" type="text/css" href="lore.css">
+    <link rel="stylesheet" type="text/css" href="../lore.css">
+
     <script>
         iconOption = 1
         function changeIcon(o)
@@ -54,10 +63,11 @@
 </div>
 <br>
 <div id="chatDiv" style="width: 300px; height: 300px; max-height: 300px; overflow-y: scroll">
+    <div hidden>
     <div class="message" id="msgBot">
         <div class="message__outer" style="flex-direction: row-reverse">
             <div class="message__avatar">
-                <img class="avatar" src="ico/Icon1.webp" width="28" height="28">
+                <img class="avatar" src="../ico/Icon1.webp" width="28" height="28">
             </div>
             <div class="message__inner" style="flex-direction: row-reverse">
                 <div class="message__bubble" style="background-color: #f0e8e8; color: rgb(30,30,33);">Hello!</div>
@@ -68,7 +78,7 @@
     <div class="message" id="msgYou">
         <div class="message__outer" style="flex-direction: row">
             <div class="message__avatar">
-                <img class="avatar" src="ico/LoL_Icon_Flat_GOLD.png" width="28" height="28">
+                <img class="avatar" src="../ico/LoL_Icon_Flat_GOLD.png" width="28" height="28">
             </div>
             <div class="message__inner">
                 <div class="message__bubble" style="background-color: rgb(30, 30, 33);">Veeery loong text about anything but nothing else!</div>
@@ -76,14 +86,18 @@
             <div class="message__status"></div>
         </div>
     </div>
+    
+    </div>
 </div>
 
 <div style="text-align: left;">
     <input type="text" id="query" placeholder="Message..."></input>
-    <button id="AskQButton" onclick="ask()"><img src="ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
-    <img id="hourglass" src="ico/zhonyas_old.webp" width="16" height="16" style="display: none">
+    <button id="AskQButton" onclick="ask()"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
+    <img id="hourglass" src="../ico/zhonyas_old.webp" width="16" height="16" style="display: none">
 </div>
 
 <script src="lore.js"></script>
 </body>
 </html>
+
+"""

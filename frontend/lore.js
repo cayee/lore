@@ -48,11 +48,12 @@ const hostName = "https://lore-poc.pwlkrz.people.aws.dev/"
 const apiHostName = hostName+"ai/"
 function callAsk(msg, callback){
     let request = new XMLHttpRequest();
-    request.open('GET', apiHostName+"AskLore?query="+msg, true);
-    request.setRequestHeader("X-Authorization", jwtCognito);
-    //request.withCredentials = true;
+    request.open('GET', apiHostName+"AskLore?query=", true);
+    //request.open('POST', apiHostName+"AskLore"+msg, true);
+    http.setRequestHeader('Content-type', 'plain/text');
+    request.withCredentials = true;
     request.onload = callback;
-    request.send();
+    request.send(msg);
 }
 
 function callToken(code, callback){
