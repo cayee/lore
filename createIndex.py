@@ -25,8 +25,7 @@ metadatas = championInfo["meta"]
 
 docs = [Document(page_content=text, metadata={'link': link}) for text, link in zip(texts, metadatas)]
 
-be = BedrockEmbeddings()
-be.client = bedrock
+be = BedrockEmbeddings(client = bedrock)
 #be.embed_documents(texts)
 
 docsearch = FAISS.from_documents(docs, be)

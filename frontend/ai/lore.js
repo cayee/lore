@@ -27,7 +27,7 @@ function ask() {
             answer = `Not allowed ${this.status}`;
         } else if (this.status === 200) {
             let response = JSON.parse(this.response);
-            answer = response.answer;
+            answer = response.answers[0].answer;
         }
         else if (this.status === 429) {
             rateLimit();
@@ -60,7 +60,7 @@ function authenticate(state, scope){
 
 document.getElementById("query").addEventListener("keydown", function(e) {
     // Enter is pressed
-    if (e.code == "Enter") { 
+    if (e.code == "Enter") {
         document.getElementById("AskQButton").click()
-     }
+    }
 }, false);
