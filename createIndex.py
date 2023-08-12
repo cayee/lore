@@ -4,6 +4,7 @@ import boto3
 from langchain.embeddings import BedrockEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.docstore import InMemoryDocstore
+from langchain.schema import Document
 from transformers import Tool
 import numpy as np
 
@@ -22,9 +23,11 @@ with open(FILENAME, 'r') as f:
 texts = championInfo["list"]
 metadatas = championInfo["meta"]
 
+docs = [Document(page_content=text, metadata={'link': link}) for text, link in zip(texts, metadatas)]
+
 be = BedrockEmbeddings()
 be.client = bedrock
 #be.embed_documents(texts)
 
-docsearch = FAISS.from_texts(texts, be, metadatas=metadatas)
+docsearch = FAISS.from_documents(docs, be)
 docsearch.save_local('index_faiss')
