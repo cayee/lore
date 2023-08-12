@@ -55,17 +55,24 @@ def getDocs(query, vectorstore):
     return docs
 
 def lambda_handler(event, context):
+    log_questions = False
     if not "query" in event:
-        if 'queryStringParameters' not in event or 'query' not in event['queryStringParameters']:
+        if 'body' not in event:
+            return {
+                'statusCode': 400,
+                'body': "Send a question, please!"
+            }
+        body = json.loads(event['body'])
+        if 'query' not in body:
             return {
                 'statusCode': 400,
                 'body': "Ask a question, please!"
             }
-        query = event['queryStringParameters']["query"]
+        query = body['query']
+        if 'logQuestions' in body:
+            log_questions = body['logQuestions']
     else:
         query = event["query"]
-
-    log_questions = False   # TODO
 
     global is_cold_start, bedrock, vectorstores
 
@@ -88,7 +95,7 @@ def lambda_handler(event, context):
     for idx in range(len(vectorstores)):
         # Find docs
         context = ""
-        doc_sources_string = ""
+        doc_sources_string = []
 
         for query in queries[:-2]+[query]:
             docs = getDocs(query, vectorstores[idx])
@@ -96,7 +103,6 @@ def lambda_handler(event, context):
                 doc_sources_string.append(doc.metadata)
                 context += doc.page_content
 
-        #prompt = f"""Use the following pieces of context to answer the question at the end.
         prompt = f"""{queries[-2]}
     
         {context}

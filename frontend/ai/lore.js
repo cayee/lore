@@ -3,6 +3,7 @@ const hourglass   = document.querySelector("#hourglass");
 const chat   = document.querySelector("#chatDiv");
 const msgBot   = document.querySelector("#msgBot");
 const msgYou   = document.querySelector("#msgYou");
+const logQs   = document.querySelector("#LogQuestions");
 
 function insertMsg(node, msg, user=false) {
     let msgNode = node.cloneNode(true);
@@ -44,10 +45,11 @@ function ask() {
 
 function callAsk(msg, callback){
     let request = new XMLHttpRequest();
-    request.open('GET', "AskLore?query="+msg, true);
+    request.open('POST', "AskAnything", true);
+    request.setRequestHeader('Content-type', 'application/json');
     request.withCredentials = true;
     request.onload = callback;
-    request.send();
+    request.send(JSON.stringify({"query":msg, "logQuestions": logQs.checked}));
 }
 
 function rateLimit() {
