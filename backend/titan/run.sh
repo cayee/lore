@@ -1,5 +1,3 @@
-#rm -rf index_faiss*
-#cp -r ../../index_faiss* .
 docker build -t ask-titan:v001 .
 docker tag ask-titan:v001 253413553580.dkr.ecr.us-east-2.amazonaws.com/llm-repo:latest
 docker push 253413553580.dkr.ecr.us-east-2.amazonaws.com/llm-repo:latest
