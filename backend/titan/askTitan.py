@@ -6,7 +6,7 @@ import boto3
 from langchain.embeddings import BedrockEmbeddings
 from langchain.vectorstores import FAISS
 
-from ddbSession import DDBsessionJWT
+from ddbSession import ChatSession
 
 is_cold_start = True
 bedrock = None
@@ -84,7 +84,7 @@ def lambda_handler(event, context):
         indexes = ["/opt/index_faiss", "/opt/index_faiss_3"]
         embeddings = BedrockEmbeddings(client=bedrock)
         vectorstores = [FAISS.load_local(index, embeddings) for index in indexes]
-        session = DDBsessionJWT()
+        session = ChatSession()
         is_cold_start = False
 
     session.init(event)
@@ -124,7 +124,7 @@ def lambda_handler(event, context):
         print({"question": query, "answers": answers})
 
     #TODO - put something useful
-    session.put()
+    session.put(query, answers[0])
     return {
         'statusCode': 200,
         'body': json.dumps(resp_json)
