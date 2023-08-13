@@ -1,14 +1,14 @@
 Website:
- - create a docker container for Lambda (with larger indexes)
- - change query request from GET to POST
+ done - create a docker container for Lambda (with larger indexes)
+ done - change query request from GET to POST
  - create a server-side session storing last questions and previous contex
  - create a textfield to easily modify prompts
  - update the GUI with an option to chat with two chatbots simultaneously
- - create logs in order to preserve some Q&A for validation
+ done - create logs in order to preserve some Q&A for validation
 
 Loremaster:
- - give the model the bigger index
- - try the approach with an index made of different-sized chunks
+ done - give the model the bigger index
+ done - try the approach with an index made of different-sized chunks
  - test prompts with json-formatted sections
 
 Vi & Jinx bots:

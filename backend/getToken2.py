@@ -11,7 +11,7 @@ def lambda_handler(event, context):
     global client_id
     global client_secret
 
-    print(f"event: {event}", f"context: {context}")
+    #print(f"event: {event}", f"context: {context}")
 
     if 'queryStringParameters' not in event or 'code' not in event['queryStringParameters']:
         return {
@@ -25,8 +25,7 @@ def lambda_handler(event, context):
             'statusCode': 400,
             'body': f'Wrong code: {code[:40]}'
         }
-    #
-    print(f"Calling Cognito oath/token")
+    #print(f"Calling Cognito oath/token")
 
     if http is None:
         if "CLIENT_ID" not in os.environ or "CLIENT_SECRET" not in os.environ:
@@ -44,7 +43,7 @@ def lambda_handler(event, context):
 
     resp = http.request('POST', f"https://lore-poc.auth.us-east-2.amazoncognito.com/oauth2/token?grant_type=authorization_code&client_id={client_id}&scope=email&redirect_uri={redirect_uri}&code={code}",
                         headers=req_headers)
-    print(f"response {resp.status}")
+    #print(f"response {resp.status}")
     if resp.status != 200:
         return {
             'statusCode': 403,
@@ -52,17 +51,16 @@ def lambda_handler(event, context):
         }
     resp_json = json.loads(resp.data.decode('utf-8'))
     if 'access_token' not in resp_json or 'refresh_token' not in resp_json:
-        print(f"Cognito error ({resp.status}) {resp_json}")
+        print(f'{{"error": "Cognito error", "error_details": "{resp.status} {resp_json}"}}')
         return {
             'statusCode': 403,
             'body': f'Not authorized by Cognito {resp_json}'
         }
 
     access_token = resp_json['access_token']
-    print(f"Access token: <REDACTED>")
 
     headers = {
-        'Set-Cookie': f'bearer={access_token}; Max-Age=3600; Path=/; SameSite=Lax; Secure; HttpOnly',
+        'Set-Cookie': f'bearer={access_token}; Max-Age=86400; Path=/; SameSite=Lax; Secure; HttpOnly',
         'Location': 'https://lore-poc.pwlkrz.people.aws.dev/ai/index.html'
     }
 

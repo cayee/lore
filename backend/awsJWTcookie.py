@@ -1,7 +1,6 @@
 import os
 import json
 import time
-import cffi
 import urllib.request
 from jose import jwk, jwt
 from jose.utils import base64url_decode
@@ -10,7 +9,7 @@ is_cold_start = True
 keys = {}
 issuer = os.getenv('Issuer', None)
 audience = os.getenv('Audience', None)
-
+cookie_name = os.getenv('Cookie')
 
 def validate_token(token):
     global keys, is_cold_start, issuer, audience
@@ -26,7 +25,7 @@ def validate_token(token):
     #    print(f'Wrong token format {token_parts} dots')
     #    return False
 
-    print(token)
+    #print(token)
 
     # get the kid from the headers prior to verification
     headers = jwt.get_unverified_headers(token)
@@ -38,7 +37,7 @@ def validate_token(token):
             key_index = i
             break
     if key_index == -1:
-        print('Public key not found in jwks.json')
+        print(f'{{"error": "Public key not found in jwks.json"}}')
         return False
     # construct the public key
     public_key = jwk.construct(keys[key_index])
@@ -49,35 +48,32 @@ def validate_token(token):
     decoded_signature = base64url_decode(encoded_signature.encode('utf-8'))
     # verify the signature
     if not public_key.verify(message.encode("utf8"), decoded_signature):
-        print('Signature verification failed')
+        print(f'{{"error": "Signature verification failed"}}')
         return False
-    print('Signature successfully verified')
+    #print('Signature successfully verified')
     # since verification succeeded, you can now safely use the unverified claims
     claims = jwt.get_unverified_claims(token)
 
     # Additionally you can verify the token expiration
     if time.time() > claims['exp']:
-        print('Token is expired')
+        print(f'{{"error": "Token is expired"}}')
         return False
     # and the Audience
     if claims['client_id'] != audience:
-        print('Token was not issued for this audience')
+        print(f'{{"error": "Token was not issued for this audience"}}')
         return False
     return True
-    #decoded_jwt = jwt.decode(token, key=keys[key_index], audience=app_client_id)
-    #return decoded_jwt
 
 def lambda_handler(event, context):
-    print(f"event: {event}")
-    cookie_name = os.getenv('Cookie')
+    #print(f"event: {event}")
     for cookie_set in event["identitySource"]:
         for cookie in cookie_set.split(";"):
             tokens = cookie.split("=")
-            print(f"token {tokens}")
+            #print(f"token {tokens}")
             if cookie_name != tokens[0].strip() or len(tokens)<2:
                 continue
             token = "=".join(tokens[1:]).strip()
-            print(f"pure token {token}")
+            #print(f"pure token {token}")
             try:
                 if validate_token(token):
                     return {

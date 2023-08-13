@@ -6,9 +6,12 @@ import boto3
 from langchain.embeddings import BedrockEmbeddings
 from langchain.vectorstores import FAISS
 
+from ddbSession import DDBsessionJWT
+
 is_cold_start = True
-bedroc = None
+bedrock = None
 vectorstores = []
+session = None
 
 def call_bedrock(bedrock, prompt):
     prompt_config = {
@@ -74,14 +77,17 @@ def lambda_handler(event, context):
     else:
         query = event["query"]
 
-    global is_cold_start, bedrock, vectorstores
+    global is_cold_start, bedrock, vectorstores, session
 
     if is_cold_start:
         bedrock = connectToBedrock()
         indexes = ["/opt/index_faiss", "/opt/index_faiss_3"]
         embeddings = BedrockEmbeddings(client=bedrock)
         vectorstores = [FAISS.load_local(index, embeddings) for index in indexes]
+        session = DDBsessionJWT()
         is_cold_start = False
+
+    session.init(event)
 
     queries = query.split("_")
     if len(queries) == 1:
@@ -116,6 +122,9 @@ def lambda_handler(event, context):
     resp_json = {"answers": answers}
     if log_questions:
         print({"question": query, "answers": answers})
+
+    #TODO - put something useful
+    session.put()
     return {
         'statusCode': 200,
         'body': json.dumps(resp_json)
