@@ -124,7 +124,7 @@ def lambda_handler(event, context):
         print({"question": query, "answers": answers})
 
     #TODO - put something useful
-    session.put(query, answers[0])
+    session.put(query, answers[0]["answer"])
     return {
         'statusCode': 200,
         'body': json.dumps(resp_json)
