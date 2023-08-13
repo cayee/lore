@@ -88,7 +88,7 @@ def lambda_handler(event, context):
         is_cold_start = False
 
     session.init(event)
-
+    #print(f"Session: {session.sess_id}, {session.data}")
     queries = query.split("_")
     if len(queries) == 1:
         queries = ["Use the following pieces of context to answer the question at the end.",

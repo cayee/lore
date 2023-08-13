@@ -15,7 +15,7 @@ class DDBsession:
     def get(self):
         if self.sess_id is None:
             return
-        self.data = self._ddb.get_item(TableName=TABLE, Key={KEY: {"S": self.sess_id}}).get("Item", {})
+        self.data = self._ddb.get_item(TableName=TABLE, Key={KEY: {"S": self.sess_id}}).get("Item", {}).get(VALUE_NAME).get("S")
 
     def put(self):
         if self.sess_id is None:
@@ -56,11 +56,11 @@ def get_session_key(event):
     for cookie_set in event['cookies']:
         for cookie in cookie_set.split(";"):
             tokens = cookie.split("=")
-            print(f"token {tokens}")
+            #print(f"token {tokens}")
             if COOKIE_NAME != tokens[0].strip() or len(tokens)<2:
                 continue
             token = "=".join(tokens[1:]).strip()
-            print(f"pure token {token}")
+            #print(f"pure token {token}")
             parts = token.split(".")
             if len(parts) != 3 or len(parts[2])<1:
                 return None

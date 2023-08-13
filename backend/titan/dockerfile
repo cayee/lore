@@ -2,10 +2,13 @@ FROM public.ecr.aws/lambda/python:3.10.2023.08.02.10
 
 COPY requirements.txt ${LAMBDA_TASK_ROOT}
 COPY askTitan.py ${LAMBDA_TASK_ROOT}
-COPY ddb-session.py ${LAMBDA_TASK_ROOT}
-COPY botocore-1.29.140-py3-none-any.whl ${LAMBDA_TASK_ROOT}
-COPY boto3-1.26.140-py3-none-any.whl ${LAMBDA_TASK_ROOT}
+COPY ddbSession.py ${LAMBDA_TASK_ROOT}
+COPY dependencies/boto* ${LAMBDA_TASK_ROOT}/
 
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
+
+COPY index_faiss /opt/index_faiss
+COPY index_faiss_3 /opt/index_faiss_3
 
 CMD [ "askTitan.lambda_handler" ]
+
