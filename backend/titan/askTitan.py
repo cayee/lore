@@ -17,7 +17,7 @@ def call_bedrock(bedrock, prompt):
     prompt_config = {
         "inputText": prompt,
         "textGenerationConfig": {
-            "maxTokenCount": 4096,
+            "maxTokenCount": 8192,
             "stopSequences": [],
             "temperature": 0.5,
             "topP": 0.2,
@@ -42,7 +42,7 @@ def connectToBedrock():
     roleArn = os.environ["titanRoleArn"]
     sts = boto3.client('sts')
 
-    resp = sts.assume_role(RoleArn=roleArn, RoleSessionName="TitanAccessFromLambda")
+    resp = sts.assume_role(RoleArn=roleArn, RoleSessionName="TitanAccessFromLambda", DurationSeconds=12*3600)
 
     return boto3.client(aws_access_key_id=resp['Credentials']['AccessKeyId'],
                         aws_secret_access_key=resp['Credentials']['SecretAccessKey'],
