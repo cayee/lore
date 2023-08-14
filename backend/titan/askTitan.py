@@ -53,8 +53,8 @@ def connectToBedrock():
                         #endpoint_url="https://bedrock.us-east-1.amazonaws.com",
                         )
 
-def getDocs(query, vectorstore):
-    docs =  vectorstore.similarity_search(query)
+def getDocs(query, vectorstore, k=4):
+    docs =  vectorstore.similarity_search(query, k=k)
     return docs
 
 def lambda_handler(event, context):
