@@ -89,13 +89,24 @@ def lambda_handler(event, context):
 
     session.init(event)
     #print(f"Session: {session.sess_id}, {session.data}")
-    queries = query.split("_")
-    if len(queries) == 1:
-        queries = ["Use the following pieces of context to answer the question at the end.",
-                   f"""
+    #queries = query.split("_")
 
-            Question: {query}
-            Answer:"""]
+    if body['contextReturnNumber'] == "":
+        body['contextReturnNumber'] = 4
+    else:
+        try:
+            body['contextReturnNumber'] = int(body['contextReturnNumber'])
+        except:
+            body['contextReturnNumber'] = 4
+
+    if body['promptSuffix'] == "":
+        body['promptSuffix'] = f"""Question: {query}
+            Answer:"""
+
+    if body['contextQuestions'] == "":
+        contextQuestions = [query]
+    else:
+        contextQuestions = body['contextQuestions'].split('_')
 
     answers = []
     for idx in range(len(vectorstores)):
@@ -103,17 +114,20 @@ def lambda_handler(event, context):
         context = ""
         doc_sources_string = []
 
-        for query in queries[:-2]+[query]:
-            docs = getDocs(query, vectorstores[idx])
+        for q in contextQuestions:
+            docs = getDocs(q, vectorstores[idx], k=body['contextReturnNumber'])
             for doc in docs:
                 doc_sources_string.append(doc.metadata)
                 context += doc.page_content
 
-        prompt = f"""{queries[-2]}
+        if body['context'] != "":
+            context = body["context"]
+
+        prompt = f"""{body['promptPrefix']}
     
         {context}
         
-        {queries[-1]}
+        {body['promptSuffix']}
         """
 
         generated_text = call_bedrock(bedrock, prompt)

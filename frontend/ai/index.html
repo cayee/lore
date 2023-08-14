@@ -81,7 +81,35 @@
 <div style="text-align: left;">
     <input type="text" id="query" placeholder="Message..."></input>
     <button id="AskQButton" onclick="ask()"><img src="ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
-    <img id="hourglass" src="ico/zhonyas_old.webp" width="16" height="16" style="display: none">
+    <img id="hourglass" src="ico/zhonyas_old.webp" width="32" height="32" style="display: none">
+</div>
+
+<div hidden>
+    <div style="text-align: left;">
+        <p>Texts used for context:</p>
+        <input type="text" id="contextQuestions" value=""></input>
+        <button class="askQButton" onclick="ask()"><img src="ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
+    </div>
+    <div style="text-align: left;">
+        <p>Number of returned context documents:</p>
+        <input type="text" id="contextReturnNumber" value="4"></input>
+        <button class="askQButton" onclick="ask()"><img src="ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
+    </div>
+    <div style="text-align: left;">
+        <p>Prompt prefix:</p>
+        <input type="text" id="promptPrefix" value="Use the following pieces of context to answer the question at the end. "></input>
+        <button class="askQButton" onclick="ask()"><img src="ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
+    </div>
+    <div style="text-align: left;">
+        <p>Context:</p>
+        <input type="text" id="context" value=""></input>
+        <button class="askQButton" onclick="ask()"><img src="ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
+    </div>
+    <div style="text-align: left;">
+        <p>Prompt sufix:</p>
+        <input type="text" id="promptSufix" value=""></input>
+        <button class="askQButton" onclick="ask()"><img src="ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
+    </div>
 </div>
 
 <script src="lore.js"></script>

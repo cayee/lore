@@ -5,6 +5,13 @@ const msgBot   = document.querySelector("#msgBot");
 const msgYou   = document.querySelector("#msgYou");
 const logQs   = document.querySelector("#LogQuestions");
 
+const debugFields = ["#contextQuestions", "#contextReturnNumber", "#promptPrefix", "#context", "#promptSuffix"]
+const cntxtQ = document.querySelector(debugFields[0]);
+const cntxtNumber = document.querySelector(debugFields[1]);
+const prptPre = document.querySelector(debugFields[2]);
+const cntxtField = document.querySelector(debugFields[3]);
+const prptSuf = document.querySelector(debugFields[4]);
+
 function insertMsg(node, msg, user=false) {
     let msgNode = node.cloneNode(true);
     msgNode.children[0].children[1].children[0].textContent = msg;
@@ -49,7 +56,9 @@ function callAsk(msg, callback){
     request.setRequestHeader('Content-type', 'application/json');
     request.withCredentials = true;
     request.onload = callback;
-    request.send(JSON.stringify({"query":msg, "logQuestions": logQs.checked}));
+    request.send(JSON.stringify({"query":msg, "logQuestions": logQs.checked, 
+    "contextQuestions": cntxtQ.value, "contextReturnNumber": cntxtNumber.value, "promptPrefix": prptPre.value,
+    "context": cntxtField.value, "promptSuffix": prptSuf.value}));
 }
 
 function rateLimit() {
