@@ -42,7 +42,7 @@ def connectToBedrock():
     roleArn = os.environ["titanRoleArn"]
     sts = boto3.client('sts')
 
-    resp = sts.assume_role(RoleArn=roleArn, RoleSessionName="TitanAccessFromLambda", DurationSeconds=12*3600)
+    resp = sts.assume_role(RoleArn=roleArn, RoleSessionName="TitanAccessFromLambda", DurationSeconds=3600)
 
     return boto3.client(aws_access_key_id=resp['Credentials']['AccessKeyId'],
                         aws_secret_access_key=resp['Credentials']['SecretAccessKey'],
