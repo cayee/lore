@@ -17,7 +17,7 @@ def call_bedrock(bedrock, prompt):
     prompt_config = {
         "inputText": prompt,
         "textGenerationConfig": {
-            "maxTokenCount": 8192,
+            "maxTokenCount": 4096,
             "stopSequences": [],
             "temperature": 0.5,
             "topP": 0.2,
