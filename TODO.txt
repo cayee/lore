@@ -2,9 +2,10 @@ Website:
  done - create a docker container for Lambda (with larger indexes)
  done - change query request from GET to POST
  - create a server-side session storing last questions and previous contex
- - create a textfield to easily modify prompts
+ halfway done - create a textfield to easily modify prompts
  - update the GUI with an option to chat with two chatbots simultaneously
  done - create logs in order to preserve some Q&A for validation
+ - handle bedrock session timeout after 1h
 
 Loremaster:
  done - give the model the bigger index
@@ -14,3 +15,6 @@ Loremaster:
 Vi & Jinx bots:
  - create input-output sets for fine-tuning
  - test the approach with dumping all the text in one prompt
+
+Demo:
+ - show the difference between clean Titan usage vs reinforcing it with embeddings
