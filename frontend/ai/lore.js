@@ -52,13 +52,13 @@ function ask() {
 
 function callAsk(msg, callback){
     let request = new XMLHttpRequest();
-    request.open('POST', "AskAnything", true);
+    request.open('POST', "AskLore", true);
     request.setRequestHeader('Content-type', 'application/json');
     request.withCredentials = true;
     request.onload = callback;
-    request.send(JSON.stringify({"query":msg, "logQuestions": logQs.checked, 
-    "contextQuestions": cntxtQ.value, "contextReturnNumber": cntxtNumber.value, "promptPrefix": prptPre.value,
-    "context": cntxtField.value, "promptSuffix": prptSuf.value}));
+    request.send(JSON.stringify({"query":msg, "logQuestions": logQs.checked,
+        "contextQuestions": cntxtQ.value, "contextReturnNumber": cntxtNumber.value, "promptPrefix": prptPre.value,
+        "context": cntxtField.value, "promptSuffix": prptSuf.value}));
 }
 
 function rateLimit() {
