@@ -92,7 +92,7 @@ def lambda_handler(event, context):
 
     if is_cold_start:
         bedrock = connectToBedrock()
-        indexes = ["/opt/index_faiss"]
+        indexes = ["/opt/index_faiss", "/opt/index_faiss_3"]
         embeddings = BedrockEmbeddings(client=bedrock)
         vectorstores = [FAISS.load_local(index, embeddings) for index in indexes]
         session = ChatMessagesSession()
