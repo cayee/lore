@@ -18,7 +18,7 @@ const prptPre = document.querySelector(debugFields[2]);
 const cntxtField = document.querySelector(debugFields[3]);
 const prptSuf = document.querySelector(debugFields[4]);
 
-function insertMsg(node, msg, user=false) {
+function insertMsg(node, msg, chat, user=false) {
     let msgNode = node.cloneNode(true);
     msgNode.children[0].children[1].children[0].textContent = msg;
     if (user == true) {
@@ -33,7 +33,7 @@ function ask() {
     if (question.length < 1) return;
 
     hourglass.style.display = "inline";
-    insertMsg(msgBot, question, true);
+    insertMsg(msgBot, question, chat, true);
 
     callAsk(question, function() { //TODO pass whether to save the question
         let answer = `Not ready ${this.status}`;
@@ -48,7 +48,7 @@ function ask() {
             answer = "Rate limited";
         }
         hourglass.style.display = "none";
-        insertMsg(msgYou, answer);
+        insertMsg(msgYou, answer, chat);
 
         if (this.status === 403 || this.status === 401) {
             window.location.href = "index.html";
@@ -72,7 +72,7 @@ function ask2() {
     if (question.length < 1) return;
 
     hourglassVi.style.display = "inline";
-    insertMsg(msgBotVi, question);
+    insertMsg(msgBotVi, question, chatVi);
 
     callAskVi(question, function() { //TODO pass whether to save the question
         let answer = `Not ready ${this.status}`;
@@ -87,7 +87,7 @@ function ask2() {
             answer = "Rate limited";
         }
         hourglassVi.style.display = "none";
-        insertMsg(msgYouVi, answer);
+        insertMsg(msgYouVi, answer, chatVi);
 
         if (this.status === 403 || this.status === 401) {
             window.location.href = "index.html";

@@ -1,3 +1,8 @@
+Code / Infrastructure:
+ - optimize Docker containers (lots of duplicate code)
+ - implement Cloud Formation for Lambda
+ - add CloudFront secure cookie
+
 Website:
  done - create a docker container for Lambda (with larger indexes)
  done - change query request from GET to POST
@@ -18,7 +23,6 @@ Vi & Jinx bots:
  - create input-output sets for fine-tuning
 done - test the approach with dumping all the text in one prompt
 do - add mechanism enabling the conversation between the user and the bot (use memory and trim the answers)
- - 
 
 Demo:
  - show the difference between clean Titan usage vs reinforcing it with embeddings
