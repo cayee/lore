@@ -13,7 +13,8 @@ bedrock = None
 vectorstores = []
 session = None
 
-def lambda_handler(event, context):
+
+def lambda_handler(event, _):
     log_questions = False
     body = {}
     if "query" not in event:

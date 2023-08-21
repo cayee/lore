@@ -90,14 +90,28 @@ class DDBsessionJWT(DDBsession):
         super().init()
 
 
-class ChatSession(DDBsessionJWT):
+class ChatSessionReset(DDBsessionJWT):
+    def init(self, event, doReset):
+        super().init(event)
+        super().reset()
+        if doReset:
+            self.update_expression += ", #questions = :query"
+            self.update_expression += ", #answers = :answer"
+            if QUESTIONS_FIELD in self.item:
+                self.item.pop(QUESTIONS_FIELD)
+            if ANSWERS_FIELD in self.item:
+                self.item.pop(ANSWERS_FIELD)
+            if ':empty_list' in self.expression_attribute_values:
+                self.expression_attribute_values.pop(':empty_list')
+        else:
+            self.update_expression += ", #questions = list_append(if_not_exists(#questions, :empty_list), :query)"
+            self.update_expression += ", #answers = list_append(if_not_exists(#answers, :empty_list), :answer)"
+            self.expression_attribute_values[':empty_list'] = {"L": []}
+
     def __init__(self):
         super().__init__()
-        self.update_expression += ", #questions = list_append(if_not_exists(#questions, :empty_list), :query)"
-        self.update_expression += ", #answers = list_append(if_not_exists(#answers, :empty_list), :answer)"
         self.expression_attribute_names["#questions"] = QUESTIONS_FIELD
         self.expression_attribute_names["#answers"] = ANSWERS_FIELD
-        self.expression_attribute_values[':empty_list'] = {"L": []}
 
     def put(self, query, answers):
         self.expression_attribute_values[':query'] = {"L": [{"S": query}]}
@@ -111,27 +125,21 @@ class ChatSession(DDBsessionJWT):
         chat_answers = [e["S"] for e in chat_answers]
         return {"questions": chat_questions, "answers": chat_answers}
 
-class ChatSessionReset(ChatSession):
-    def init(self, event, doReset):
-        super().init(event)
-        super().reset()
-        if doReset:
-            self.update_expression += ", #questions = :query"
-            self.update_expression += ", #answers = :answer"
-            if QUESTIONS_FIELD in self.item: self.item.pop(QUESTIONS_FIELD)
-            if ANSWERS_FIELD in self.item: self.item.pop(ANSWERS_FIELD)
-            if ':empty_list' in self.expression_attribute_values: self.expression_attribute_values.pop(':empty_list')
-        else:
-            self.update_expression += ", #questions = list_append(if_not_exists(#questions, :empty_list), :query)"
-            self.update_expression += ", #answers = list_append(if_not_exists(#answers, :empty_list), :answer)"
-            self.expression_attribute_values[':empty_list'] = {"L": []}
+
+class ChatSession(ChatSessionReset):
+    def init(self, event):
+        super().init(event, False)
+
 
 class ChatMessagesSession(ChatSession):
     def __init__(self):
         super().__init__()
-        self.update_expression += ", #chat = :messages"
         self.projection_expression += f", {CHAT_FIELD}"
         self.expression_attribute_names["#chat"] = CHAT_FIELD
+
+    def reset(self):
+        super().reset()
+        self.update_expression += ", #chat = :messages"
 
     def load(self):
         chat_state = self.item[CHAT_FIELD]["S"] if CHAT_FIELD in self.item else "{}"
