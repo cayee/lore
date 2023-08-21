@@ -8,7 +8,6 @@ COPY dependencies/boto* ${LAMBDA_TASK_ROOT}/
 RUN pip install -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
 
 COPY index_faiss /opt/index_faiss
-COPY index_faiss_3 /opt/index_faiss_3
 
 CMD [ "askTitanVi.lambda_handler" ]
 

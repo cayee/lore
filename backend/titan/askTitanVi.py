@@ -3,7 +3,7 @@ import os
 
 import boto3
 
-from ddbSession import ChatSession
+from ddbSession import ChatSessionReset
 
 from langchain.embeddings import BedrockEmbeddings
 from langchain.vectorstores import FAISS
@@ -85,6 +85,7 @@ def lambda_handler(event, context):
         query = body['query']
         if 'logQuestions' in body:
             log_questions = body['logQuestions']
+        doReset = body['resetChat'] if 'resetChat' in body else False
     else:
         query = event["query"]
 
@@ -92,13 +93,13 @@ def lambda_handler(event, context):
 
     if is_cold_start:
         bedrock = connectToBedrock()
-        indexes = ["/opt/index_faiss", "/opt/index_faiss_3"]
+        indexes = ["/opt/index_faiss"]
         embeddings = BedrockEmbeddings(client=bedrock)
         vectorstores = [FAISS.load_local(index, embeddings) for index in indexes]
-        session = ChatSession()
+        session = ChatSessionReset()
         is_cold_start = False
 
-    session.init(event)
+    session.init(event, doReset)
     msgHistory = session.load()
 
     answers = []
@@ -107,7 +108,7 @@ def lambda_handler(event, context):
         context = ""
         doc_sources_string = []
         
-        docs = getDocs(query, vectorstore, k=body['contextReturnNumber'])
+        docs = getDocs(query, vectorstore)
         for doc in docs:
             doc_sources_string.append(doc.metadata)
             context += doc.page_content
@@ -118,10 +119,10 @@ def lambda_handler(event, context):
         prompt = """You are playing a character named Vi. Here are some texts about Vi:
         {["texts": "This text is about Vi.  The truth, however, finally came to light when Old Hungry’s Scars—a vicious gang whose murder sprees had spread topside—were brought down by a respected sheriff of Piltover and her new ally… Vi.The former gang leader was now in the employ of the Wardens, and she had replaced the chem-powered pulverizer gauntlets with a pair of brand new hextech Atlas prototypes.This text is about Vi. ”“I can’t.”Vi tapped a finger on her chin, as if weighing whether to punch him again. She smiled, the expression worrying Devaki more than the thought of her fists.“Be a shame if word got round the Lanes that you’d been informing on all your criminal friends for the last couple of years.”“What?” said Devaki, spluttering in pain and indignation.This text is about Vi.  “That’s a lie!”“Of course it is,” said Vi, “but I know all the right people to talk to down there. A lot of folk’ll listen if I let it slip that you’re in the wardens’ pocket.”“I’ll be dead in a day if you do that,” protested Devaki.“Now you’re catching on,” said Vi. “Tell me what I want to know.Once a criminal from the mean streets of Zaun, Vi is a hotheaded, impulsive, and fearsome woman with only a very loose respect for authority figures. Growing up all but alone, Vi developed finely honed survival instincts as well as a wickedly abrasive sense of humor. Now working with the Wardens to keep the peace in Piltover, she wields mighty hextech gauntlets that can punch through walls—and suspects—with equal ease."]}
         Here is some context to the situation:
-        {}
+        """+ context + """
         
         Complete the following short story as Vi:       
-        {["context": """.format(context)
+        {["context": """
 
         #depending on the location
         prompt += "Rookie is a new enforcer in piltovian police force. Vi is taking him to the Ecliptic Vaults where an attempted robbery has been reported. Vi should not say where they are going or what happened there unless asked. Moreover, Vi has a feeling she knows who is responsible for it but will not share this information for now.\""

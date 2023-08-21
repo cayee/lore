@@ -42,6 +42,9 @@ class DDBsession:
     def init(self):
         self.get()
 
+    def reset(self):
+        self.update_expression = 'ADD #counter :increment SET #createdAt = if_not_exists(#createdAt, :now), #ttl = :ttl'
+
     def __init__(self):
         self.sess_id = None
         self.item = None
@@ -49,7 +52,7 @@ class DDBsession:
         # set projection expression
         self.projection_expression = KEY
         # set update expression
-        self.update_expression = 'ADD #counter :increment SET #createdAt = if_not_exists(#createdAt, :now), #ttl = :ttl'
+        self.reset()
         self.expression_attribute_names = {
             '#counter': 'AccessCounter',
             '#createdAt': 'CreatedAt',
@@ -108,6 +111,20 @@ class ChatSession(DDBsessionJWT):
         chat_answers = [e["S"] for e in chat_answers]
         return {"questions": chat_questions, "answers": chat_answers}
 
+class ChatSessionReset(ChatSession):
+    def init(self, event, doReset):
+        super().init(event)
+        super().reset()
+        if doReset:
+            self.update_expression += ", #questions = :query"
+            self.update_expression += ", #answers = :answer"
+            if QUESTIONS_FIELD in self.item: self.item.pop(QUESTIONS_FIELD)
+            if ANSWERS_FIELD in self.item: self.item.pop(ANSWERS_FIELD)
+            if ':empty_list' in self.expression_attribute_values: self.expression_attribute_values.pop(':empty_list')
+        else:
+            self.update_expression += ", #questions = list_append(if_not_exists(#questions, :empty_list), :query)"
+            self.update_expression += ", #answers = list_append(if_not_exists(#answers, :empty_list), :answer)"
+            self.expression_attribute_values[':empty_list'] = {"L": []}
 
 class ChatMessagesSession(ChatSession):
     def __init__(self):
