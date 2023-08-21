@@ -1,5 +1,5 @@
 Code / Infrastructure:
- - optimize Docker containers (lots of duplicate code)
+ done - optimize Docker containers (lots of duplicate code)
  - implement Cloud Formation for Lambda
  - add CloudFront secure cookie
 
@@ -7,27 +7,31 @@ Website:
  done - create a docker container for Lambda (with larger indexes)
  done - change query request from GET to POST
  done - create a server-side session...
- - ...storing last questions and previous contex
+ done - ...storing last questions
+ - ...storing previous contex
  done - create a textfield to easily modify prompts
  - create a textarea to easily modify prompts
  - update the GUI with an option to chat with two chatbots simultaneously
  done - create logs in order to preserve some Q&A for validation
  - handle bedrock session timeout after 1h
+ - add user-controlled session suffix - can be used to handle multiple, independent chats
 
 Loremaster:
  done - give the model the bigger index
  done - try the approach with an index made of different-sized chunks
- - test prompts with json-formatted sections
+ do - test prompts with json-formatted sections
 
 Vi & Jinx bots:
  - create input-output sets for fine-tuning
-done - test the approach with dumping all the text in one prompt
-do - add mechanism enabling the conversation between the user and the bot (use memory and trim the answers)
+ done - test the approach with dumping all the text in one prompt
+ do - add mechanism enabling the conversation between the user and the bot (use memory and trim the answers)
 
 Demo:
  - show the difference between clean Titan usage vs reinforcing it with embeddings
  -? show how subtitles affect how the bot articulates sentences
- 
+ -? show how Garen responds differently than Vi
+
 Security:
  - prevent JSON prompt injection
+ - prevent uer from injecting Bot: Vi: prefixes
  - prevent user from interfering with the story by manipulating the facts
