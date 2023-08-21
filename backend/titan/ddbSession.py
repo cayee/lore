@@ -137,8 +137,8 @@ class ChatMessagesSession(ChatSession):
         self.projection_expression += f", {CHAT_FIELD}"
         self.expression_attribute_names["#chat"] = CHAT_FIELD
 
-    def reset(self):
-        super().reset()
+    def init(self, event):
+        super().init(event)
         self.update_expression += ", #chat = :messages"
 
     def load(self):

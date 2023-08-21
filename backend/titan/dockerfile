@@ -2,7 +2,5 @@ FROM titan-base:v001
 
 COPY *.py ${LAMBDA_TASK_ROOT}/
 
-COPY index_faiss_3 /opt/index_faiss_3
-
 CMD [ "askTitan.lambda_handler" ]
 
