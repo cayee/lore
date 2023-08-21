@@ -21,7 +21,7 @@ const prptSuf = document.querySelector(debugFields[4]);
 function insertMsg(node, msg, chat, user=false) {
     let msgNode = node.cloneNode(true);
     msgNode.children[0].children[1].children[0].textContent = msg;
-    if (user == true) {
+    if (user === true) {
         msgNode.children[0].children[0].children[0].src = "../ico/Icon" + iconOption + ".webp";
     }
     chat.appendChild(msgNode);
@@ -101,20 +101,16 @@ function callAskVi(msg, callback){
     request.setRequestHeader('Content-type', 'application/json');
     request.withCredentials = true;
     request.onload = callback;
-    request.send(JSON.stringify({"query":msg, "logQuestions": logQs.checked}));
+    request.send(JSON.stringify({"query":msg, "logQuestions": logQs.checked, "resetChat": false}));
 }
 
 function rateLimit() {
     //TODO
 }
 
-function authenticate(state, scope){
-    window.location.href = "index.html";
-}
-
 document.getElementById("query").addEventListener("keydown", function(e) {
     // Enter is pressed
-    if (e.code == "Enter") {
+    if (e.code === "Enter") {
         document.getElementById("AskQButton").click()
     }
 }, false);
