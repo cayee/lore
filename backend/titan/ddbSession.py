@@ -101,6 +101,13 @@ class ChatSession(DDBsessionJWT):
         self.expression_attribute_values[':answer'] = {"L": [{"S": answers[0]["answer"]}]}
         super().put()
 
+    def load(self):
+        chat_questions = self.item[QUESTIONS_FIELD]["L"] if QUESTIONS_FIELD in self.item else []
+        chat_questions = [e["S"] for e in chat_questions]
+        chat_answers = self.item[ANSWERS_FIELD]["L"] if ANSWERS_FIELD in self.item else []
+        chat_answers = [e["S"] for e in chat_answers]
+        return {"questions": chat_questions, "answers": chat_answers}
+
 
 class ChatMessagesSession(ChatSession):
     def __init__(self):

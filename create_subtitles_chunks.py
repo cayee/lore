@@ -10,25 +10,27 @@ currentListener = ""
 textChunks = []
 for i, row in data.iterrows():
     if currentSpeaker == row["Who said it:"] and currentListener == row["Who was it said to:"]:
-        if currentSpeaker != "Vi":
+        if currentSpeaker != "Caitlyn":
             continue
         textChunks[-1] = textChunks[-1] + " " + row["Text:"]
         continue
     currentSpeaker = row["Who said it:"]
     currentListener = row["Who was it said to:"]
-    if currentSpeaker == "" or currentSpeaker != "Vi":
+    if currentSpeaker == "" or currentSpeaker != "Caitlyn":
         continue
+    textChunks.append(row["Text:"])
+    continue
     if currentListener == "":
         textChunks.append(f"{currentSpeaker} said: {row['Text:']}")
     else:
         textChunks.append(f"{currentSpeaker} said to {currentListener}: {row['Text:']}")
         
 finality = {"texts": textChunks}
-with open("subtitles_chunks_vi.json", "w") as f:
+with open("subtitles_chunks_clean_caitlyn.json", "w") as f:
     jsonData = json.dumps(finality)
     f.write(jsonData)
 
-with open("subtitles_vi.txt", 'w') as f:
+with open("subtitles_clean_caitlyn.txt", 'w') as f:
     for line in textChunks:
         f.write(line)
         f.write('\n')

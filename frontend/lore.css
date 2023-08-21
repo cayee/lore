@@ -51,7 +51,16 @@ body {
     height: 32px; width: 242px; vertical-align: middle; background-color: #221E1F; border-color: #221E1F; color: #f0e6d2
 }
 
+.queryStyle {
+    height: 32px; width: 242px; vertical-align: middle; background-color: #221E1F; border-color: #221E1F; color: #f0e6d2
+}
+
 input[type=text]
 {
     font-size: 16px;
+}
+
+.subTitle {
+    font-family: "Beaufort for LOL";
+    color: #f0e6d2;
 }
