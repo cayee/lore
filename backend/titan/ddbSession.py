@@ -91,6 +91,12 @@ class DDBsessionJWT(DDBsession):
 
 
 class ChatSessionReset(DDBsessionJWT):
+    def __init__(self):
+        super().__init__()
+        self.expression_attribute_names["#questions"] = QUESTIONS_FIELD
+        self.expression_attribute_names["#answers"] = ANSWERS_FIELD
+        self.projection_expression += f", {QUESTIONS_FIELD}, {ANSWERS_FIELD}"
+
     def init(self, event, doReset):
         super().init(event)
         super().reset()
@@ -107,11 +113,6 @@ class ChatSessionReset(DDBsessionJWT):
             self.update_expression += ", #questions = list_append(if_not_exists(#questions, :empty_list), :query)"
             self.update_expression += ", #answers = list_append(if_not_exists(#answers, :empty_list), :answer)"
             self.expression_attribute_values[':empty_list'] = {"L": []}
-
-    def __init__(self):
-        super().__init__()
-        self.expression_attribute_names["#questions"] = QUESTIONS_FIELD
-        self.expression_attribute_names["#answers"] = ANSWERS_FIELD
 
     def put(self, query, answers):
         self.expression_attribute_values[':query'] = {"L": [{"S": query}]}
