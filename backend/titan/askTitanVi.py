@@ -1,4 +1,5 @@
 import json
+import time
 
 from ddbSession import ChatSessionReset
 from askBedrock import connectToBedrock, getDocs, call_bedrock
@@ -10,9 +11,12 @@ session = None
 
 
 def lambda_handler(event, _):
+    startTime = time.time()
+    print(f"Start time: {time.time() - startTime}")
     log_questions = False
     doReset = False
     body = {}
+    clientSessId = ''
     if "query" not in event:
         if 'body' not in event:
             return {
@@ -26,9 +30,9 @@ def lambda_handler(event, _):
                 'body': "Ask a question, please!"
             }
         query = body['query']
-        if 'logQuestions' in body:
-            log_questions = body['logQuestions']
+        log_questions = body['logQuestions'] if 'logQuestions' in body else False
         doReset = body['resetChat'] if 'resetChat' in body else False
+        clientSessId = body['sessId'] if 'sessId' in body else ''
     else:
         query = event["query"]
 
@@ -39,20 +43,24 @@ def lambda_handler(event, _):
         session = ChatSessionReset()
         is_cold_start = False
 
-    session.init(event, doReset)
+    print(f"Before session init: {time.time() - startTime}")
+    session.init(event, clientSessId, doReset)
+    print(f"After session init: {time.time() - startTime}")
     msgHistory = session.load()
-
+    print(f"After session load: {time.time() - startTime}")
     answers = []
     for vectorstore in vectorstores:
         # Find docs
         context = ""
         doc_sources_string = []
         
+        print(f"Before getDocs: {time.time() - startTime}")
         docs = getDocs(query, vectorstore)
         for doc in docs:
             doc_sources_string.append(doc.metadata)
             context += doc.page_content
 
+        print(f"After getDocs: {time.time() - startTime}")
         if 'context' in body and body['context'] != "":
             context = body["context"]
 
@@ -77,9 +85,13 @@ def lambda_handler(event, _):
             prompt += "Rookie: " + q + " Vi: " + a + " "
         
         # first - use just a prompt
-        generated_text = call_bedrock(bedrock, prompt)
-
         # beautify the response:
+        bedrockStartTime = time.time() - startTime
+        print(f"Before bedrock call: {bedrockStartTime}")
+        generated_text = call_bedrock(bedrock, prompt)
+        bedrockEndTime = time.time() - startTime
+        print(f"After bedrock call: {bedrockEndTime}")
+        print({"bedrockStartTime": bedrockStartTime, "bedrockEndTime": bedrockEndTime, "bedrockCallTime": bedrockEndTime - bedrockStartTime, "promptLength": len(prompt), "prompt": prompt})
         # cut everything out after the first 'Rookie' appearance
         ix = generated_text.find('Rookie:')
         if ix != -1:
@@ -91,8 +103,11 @@ def lambda_handler(event, _):
     if log_questions:
         print({"question": query, "answers": answers})
 
+    print(f"Before session put: {time.time() - startTime}")
     session.put(query, answers)
+    print(f"After session put: {time.time() - startTime}")
     return {
         'statusCode': 200,
         'body': json.dumps(resp_json)
     }
+

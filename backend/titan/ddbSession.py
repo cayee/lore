@@ -85,8 +85,9 @@ def get_session_key(event):
 
 
 class DDBsessionJWT(DDBsession):
-    def init(self, event):
+    def init(self, event, clientSessId):
         self.sess_id = get_session_key(event)
+        self.sess_id = clientSessId if self.sess_id is None else self.sess_id+clientSessId
         super().init()
 
 
@@ -97,8 +98,8 @@ class ChatSessionReset(DDBsessionJWT):
         self.expression_attribute_names["#answers"] = ANSWERS_FIELD
         self.projection_expression += f", {QUESTIONS_FIELD}, {ANSWERS_FIELD}"
 
-    def init(self, event, doReset):
-        super().init(event)
+    def init(self, event, clientSessId, doReset):
+        super().init(event, clientSessId)
         super().reset()
         if doReset:
             self.update_expression += ", #questions = :query"
@@ -128,8 +129,8 @@ class ChatSessionReset(DDBsessionJWT):
 
 
 class ChatSession(ChatSessionReset):
-    def init(self, event):
-        super().init(event, False)
+    def init(self, event, clientSessId):
+        super().init(event, clientSessId, False)
 
 
 class ChatMessagesSession(ChatSession):
@@ -138,8 +139,8 @@ class ChatMessagesSession(ChatSession):
         self.projection_expression += f", {CHAT_FIELD}"
         self.expression_attribute_names["#chat"] = CHAT_FIELD
 
-    def init(self, event):
-        super().init(event)
+    def init(self, event, clientSessId):
+        super().init(event, clientSessId)
         self.update_expression += ", #chat = :messages"
 
     def load(self):
