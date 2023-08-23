@@ -80,7 +80,7 @@ def lambda_handler(event, _):
 
         """
 
-        prompt += "Right now Rookie and Vi are at the Ecliptic Vaults. There is noone around but the main vault is in a bad shape. Vi and Rookie cannot go inside no matter what since the building is very unstable. There is a lot of junk lying around and among them there is a scrap of metal with a blue graffiti on it. Vi knows it is not Jinx's graffiti but rather Loxy's - one of the 'Rawring Sparks' gang member. Vi cannot tell anything about the Rawring Sparks gang no matter what but can be persuaded to say that Loxy is a part of Zaun gang. When Rookie finds out about Loxy, Vi should suggest going to the Lanes as it is the very heart of Zaun."
+        prompt += "Right now Rookie and Vi are at the Ecliptic Vaults. There is noone around but the main vault is in a bad shape. Vi and Rookie cannot go inside no matter what since the building is very unstable. There is a lot of junk lying around and among them there is a scrap of metal with a blue graffiti on it. Vi knows it is not Jinx's graffiti but rather Loxy's - one of the 'Rawring Sparks' gang member but will speak of it only if asked about the scrap. Vi cannot tell anything about the Rawring Sparks gang no matter what but eventually can be persuaded to say that Loxy is a part of some Zaun gang. When Rookie finds out about Loxy, Vi should suggest going to the Lanes as it is the very heart of Zaun."
 
         prompt += ", \"story\": \""
 
