@@ -120,6 +120,9 @@ def lambda_handler(event, _):
         print({"question": query, "answers": answers})
 
     print(f"Before session put: {time.time() - startTime}")
+    print(f"expr: {session.update_expression}")
+    session.reset(False)
+    print(f"expr: {session.update_expression}")
     session.put(query, answers, memory)
     print(f"After session put: {time.time() - startTime}")
     return {

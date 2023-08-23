@@ -1,7 +1,7 @@
 import json
 import time
 
-from ddbSession import ChatSessionReset
+from ddbSession import ChatSessionLocation
 from askBedrock import connectToBedrock, getDocs, call_bedrock
 
 is_cold_start = True
@@ -40,11 +40,11 @@ def lambda_handler(event, _):
 
     if is_cold_start:
         bedrock, vectorstores = connectToBedrock(["/opt/index_faiss"])
-        session = ChatSessionReset()
+        session = ChatSessionLocation()
         is_cold_start = False
 
     print(f"Before session init: {time.time() - startTime}")
-    session.init(event, clientSessId, doReset)
+    session.init(event, clientSessId)
     print(f"After session init: {time.time() - startTime}")
     msgHistory = session.load()
     print(f"After session load: {time.time() - startTime}")
@@ -95,6 +95,7 @@ def lambda_handler(event, _):
         # beautify the response:
         bedrockStartTime = time.time() - startTime
         print(f"Before bedrock call: {bedrockStartTime}")
+        #prompt = "Rookie: " + query + " Vi: " + call_bedrock(bedrock, prompt)
         generated_text = call_bedrock(bedrock, prompt)
         bedrockEndTime = time.time() - startTime
         print(f"After bedrock call: {bedrockEndTime}")
@@ -114,7 +115,10 @@ def lambda_handler(event, _):
         print({"question": query, "answers": answers})
 
     print(f"Before session put: {time.time() - startTime}")
-    session.put(query, answers)
+    session.reset(doReset)
+    location = "Piltover"
+    summary = ""
+    session.put(query, answers, location, summary)
     print(f"After session put: {time.time() - startTime}")
     return {
         'statusCode': 200,

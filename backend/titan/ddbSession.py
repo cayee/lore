@@ -13,6 +13,8 @@ TTL_FIELD = os.getenv('TTL')
 TTL_TIME = int(os.getenv('TTLtime'))
 ANSWERS_FIELD = os.getenv('Answers')
 QUESTIONS_FIELD = os.getenv('Questions')
+LOCATION_FIELD = os.getenv('Location')
+SUMMARY_FIELD = os.getenv('Summary')
 CHAT_FIELD = os.getenv('Chat')
 
 COOKIE_NAME = os.getenv('Cookie')
@@ -52,7 +54,7 @@ class DDBsession:
         # set projection expression
         self.projection_expression = KEY
         # set update expression
-        self.reset()
+        self.update_expression = 'ADD #counter :increment SET #createdAt = if_not_exists(#createdAt, :now), #ttl = :ttl'
         self.expression_attribute_names = {
             '#counter': 'AccessCounter',
             '#createdAt': 'CreatedAt',
@@ -91,15 +93,14 @@ class DDBsessionJWT(DDBsession):
         super().init()
 
 
-class ChatSessionReset(DDBsessionJWT):
+class ChatSession(DDBsessionJWT):
     def __init__(self):
         super().__init__()
         self.expression_attribute_names["#questions"] = QUESTIONS_FIELD
         self.expression_attribute_names["#answers"] = ANSWERS_FIELD
         self.projection_expression += f", {QUESTIONS_FIELD}, {ANSWERS_FIELD}"
 
-    def init(self, event, clientSessId, doReset):
-        super().init(event, clientSessId)
+    def reset(self, doReset):
         super().reset()
         if doReset:
             self.update_expression += ", #questions = :query"
@@ -128,19 +129,36 @@ class ChatSessionReset(DDBsessionJWT):
         return {"questions": chat_questions, "answers": chat_answers}
 
 
-class ChatSession(ChatSessionReset):
-    def init(self, event, clientSessId):
-        super().init(event, clientSessId, False)
+class ChatSessionLocation(ChatSession):
+    def __init__(self):
+        super().__init__()
+        self.projection_expression += f", {LOCATION_FIELD}, {SUMMARY_FIELD}"
+        self.expression_attribute_names["#location"] = LOCATION_FIELD
+        self.expression_attribute_names["#summary"] = SUMMARY_FIELD
+        self.update_expression += ", #location = :location, #summary = :summary"
 
+    def reset(self, doReset):
+        super().reset(doReset)
+        self.update_expression += ", #location = :location, #summary = :summary"
+
+    def put(self, query, answers, location, summary):
+        self.expression_attribute_values[':location'] = {"S": location}
+        self.expression_attribute_values[':summary'] = {"S": summary}
+        super().put(query, answers)
+
+    def load(self):
+        qa = super().load()
+        if qa is None:
+            qa = {}
+        qa["location"] = self.item[LOCATION_FIELD]["S"] if LOCATION_FIELD in self.item else None
+        qa["summary"] = self.item[SUMMARY_FIELD]["S"] if SUMMARY_FIELD in self.item else None
+        return qa
 
 class ChatMessagesSession(ChatSession):
     def __init__(self):
         super().__init__()
         self.projection_expression += f", {CHAT_FIELD}"
         self.expression_attribute_names["#chat"] = CHAT_FIELD
-
-    def init(self, event, clientSessId):
-        super().init(event, clientSessId)
         self.update_expression += ", #chat = :messages"
 
     def load(self):
@@ -155,3 +173,7 @@ class ChatMessagesSession(ChatSession):
 
         self.expression_attribute_values[':messages'] = {"S": json.dumps(messages_to_dict(memory.buffer))}
         super().put(query, answers)
+
+    def reset(self, doReset):
+        super().reset(doReset)
+        self.update_expression += ", #chat = :messages"

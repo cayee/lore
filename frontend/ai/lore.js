@@ -64,7 +64,7 @@ function callAsk(msg, callback){
     request.onload = callback;
     request.send(JSON.stringify({"query":msg, "logQuestions": logQs.checked,
         "contextQuestions": cntxtQ.value, "contextReturnNumber": cntxtNumber.value, "promptPrefix": prptPre.value,
-        "context": cntxtField.value, "promptSuffix": prptSuf.value}));
+        "context": cntxtField.value, "promptSuffix": prptSuf.value, "sessId": "Lore"}));
 }
 
 function ask2() {
@@ -101,7 +101,7 @@ function callAskVi(msg, callback){
     request.setRequestHeader('Content-type', 'application/json');
     request.withCredentials = true;
     request.onload = callback;
-    request.send(JSON.stringify({"query":msg, "logQuestions": logQs.checked, "resetChat": false}));
+    request.send(JSON.stringify({"query":msg, "logQuestions": logQs.checked, "resetChat": false, "sessId": "Vi"}));
 }
 
 function rateLimit() {
