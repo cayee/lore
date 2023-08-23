@@ -55,7 +55,8 @@ def lambda_handler(event, _):
         doc_sources_string = []
         
         print(f"Before getDocs: {time.time() - startTime}")
-        docs = getDocs(query, vectorstore)
+        #docs = getDocs(query, vectorstore)
+        docs = getDocs("Ecliptic Vaults", vectorstore)
         for doc in docs:
             doc_sources_string.append(doc.metadata)
             context += doc.page_content
@@ -73,7 +74,7 @@ def lambda_handler(event, _):
         {["context": """
 
         # depending on the location
-        prompt += "Rookie is a new enforcer in piltovian police force. Vi is taking him to the Ecliptic Vaults where an attempted robbery has been reported. Vi should not say where they are going or what happened there unless asked. Moreover, Vi has a feeling she knows who is responsible for it but will not share this information for now.\""
+        prompt += "Rookie is a new enforcer in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and take Rookie with her since someone broke into the vault. Noone was hurt at the scene but the perpetrators could still be in the area. Vi should not say where they are going or what happened there unless asked. Moreover, Vi knows the Zaun gang 'Rawring Lightnings' is responsible for the break in but will not share this information for now.\""
 
         prompt += ", \"story\": \""
 
