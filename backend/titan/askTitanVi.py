@@ -16,6 +16,7 @@ def lambda_handler(event, _):
     log_questions = False
     doReset = False
     body = {}
+    clientSessId = ''
     if "query" not in event:
         if 'body' not in event:
             return {
@@ -29,9 +30,9 @@ def lambda_handler(event, _):
                 'body': "Ask a question, please!"
             }
         query = body['query']
-        if 'logQuestions' in body:
-            log_questions = body['logQuestions']
+        log_questions = body['logQuestions'] if 'logQuestions' in body else False
         doReset = body['resetChat'] if 'resetChat' in body else False
+        clientSessId = body['sessId'] if 'sessId' in body else ''
     else:
         query = event["query"]
 
@@ -43,7 +44,7 @@ def lambda_handler(event, _):
         is_cold_start = False
 
     print(f"Before session init: {time.time() - startTime}")
-    session.init(event, doReset)
+    session.init(event, clientSessId, doReset)
     print(f"After session init: {time.time() - startTime}")
     msgHistory = session.load()
     print(f"After session load: {time.time() - startTime}")
@@ -84,14 +85,13 @@ def lambda_handler(event, _):
             prompt += "Rookie: " + q + " Vi: " + a + " "
         
         # first - use just a prompt
+        # beautify the response:
         bedrockStartTime = time.time() - startTime
         print(f"Before bedrock call: {bedrockStartTime}")
         generated_text = call_bedrock(bedrock, prompt)
         bedrockEndTime = time.time() - startTime
         print(f"After bedrock call: {bedrockEndTime}")
         print({"bedrockStartTime": bedrockStartTime, "bedrockEndTime": bedrockEndTime, "bedrockCallTime": bedrockEndTime - bedrockStartTime, "promptLength": len(prompt), "prompt": prompt})
-
-        # beautify the response:
         # cut everything out after the first 'Rookie' appearance
         ix = generated_text.find('Rookie:')
         if ix != -1:
@@ -110,3 +110,4 @@ def lambda_handler(event, _):
         'statusCode': 200,
         'body': json.dumps(resp_json)
     }
+

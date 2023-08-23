@@ -15,7 +15,8 @@ Website:
  done - update the GUI with an option to chat with two chatbots simultaneously
  done - create logs in order to preserve some Q&A for validation
  - handle bedrock session timeout after 1h
- - add user-controlled session suffix - can be used to handle multiple, independent chats
+ done - add user-controlled session suffix - can be used to handle multiple, independent chats
+ - catch error calling bedrock and return gracefully to the app
 
 Loremaster:
  done - give the model the bigger index
