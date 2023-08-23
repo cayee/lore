@@ -56,7 +56,7 @@ def lambda_handler(event, _):
         
         print(f"Before getDocs: {time.time() - startTime}")
         #docs = getDocs(query, vectorstore)
-        docs = getDocs("Ecliptic Vaults", vectorstore)
+        docs = getDocs("the Lanes", vectorstore)
         for doc in docs:
             doc_sources_string.append(doc.metadata)
             context += doc.page_content
@@ -74,7 +74,13 @@ def lambda_handler(event, _):
         {["context": """
 
         # depending on the location
-        prompt += "Rookie is a new enforcer in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and take Rookie with her since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. Vi should not say where they are going or what happened there unless asked. Moreover, Vi knows the Zaun gang 'Rawring Sparks' is responsible for the break in but will not share this information for now no matter what.\""
+        #prompt += "Rookie is a new enforcer in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and take Rookie with her since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. Vi should not say where they are going or what happened there unless asked. Moreover, Vi knows the Zaun gang 'Rawring Sparks' is responsible for the break in but will not share this information for now no matter what.\""
+        prompt += """
+        Rookie is a new enforcer in the Piltovian police force, and Vi has been ordered to take Rookie to the Ecliptic Vaults, which have been broken into. Vi knows the Zaun gang Rawring Sparks is responsible for the break-in, but she will not share this information. Rookie is eager to learn more about the case, but Vi is not allowed to say anything more. Vi explains that the vaults are massive and hold some of the most valuable things in Piltover and Zaun and are guarded by some of the strongest people around. Rookie and Vi then head to the Ecliptic Vaults.
+
+        """
+
+        prompt += "Right now Rookie and Vi are at the Ecliptic Vaults. There is noone around but the main vault is in a bad shape. Vi and Rookie cannot go inside no matter what since the building is very unstable. There is a lot of junk lying around and among them there is a scrap of metal with a blue graffiti on it. Vi knows it is not Jinx's graffiti but rather Loxy's - one of the 'Rawring Sparks' gang member. Vi cannot tell anything about the Rawring Sparks gang no matter what but can be persuaded to say that Loxy is a part of Zaun gang. When Rookie finds out about Loxy, Vi should suggest going to the Lanes as it is the very heart of Zaun."
 
         prompt += ", \"story\": \""
 
@@ -97,6 +103,9 @@ def lambda_handler(event, _):
         ix = generated_text.find('Rookie:')
         if ix != -1:
             generated_text = generated_text[:ix]
+        if generated_text[-3:] == '"]}':
+            generated_text = generated_text[:-3]
+            # change scene TODO
 
         answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt})
 
