@@ -2,16 +2,17 @@ Code / Infrastructure:
  done - optimize Docker containers (lots of duplicate code)
  - implement Cloud Formation for Lambda
  - add CloudFront secure cookie
+ - make Lambda respond within 30 seconds (or shut it down)
 
 Website:
  done - create a docker container for Lambda (with larger indexes)
  done - change query request from GET to POST
  done - create a server-side session...
  done - ...storing last questions
- - ...storing previous contex
+ - ...storing previous context
  done - create a textfield to easily modify prompts
  - create a textarea to easily modify prompts
- - update the GUI with an option to chat with two chatbots simultaneously
+ done - update the GUI with an option to chat with two chatbots simultaneously
  done - create logs in order to preserve some Q&A for validation
  - handle bedrock session timeout after 1h
  - add user-controlled session suffix - can be used to handle multiple, independent chats
