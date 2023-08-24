@@ -82,6 +82,7 @@ function ask2() {
         } else if (this.status === 200) {
             let response = JSON.parse(this.response);
             answer = response.answers[0].answer;
+            storyLocation = response.answers[0].location
         }
         else if (this.status === 429) {
             rateLimit();
@@ -89,8 +90,7 @@ function ask2() {
         }
         hourglassVi.style.display = "none";
         insertMsg(msgYouVi, answer, chatVi);
-        locationVi.textContent = "Location: " + response.answers[0].location
-
+        locationVi.textContent = "Location: " + storyLocation
         if (this.status === 403 || this.status === 401) {
             window.location.href = "index.html";
         }
