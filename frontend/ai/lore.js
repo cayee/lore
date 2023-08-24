@@ -45,7 +45,6 @@ function ask() {
             answer = response.answers[0].answer;
         }
         else if (this.status === 429) {
-            rateLimit();
             answer = "Rate limited";
         }
         hourglass.style.display = "none";
@@ -77,6 +76,7 @@ function ask2() {
 
     callAskVi(question, function() { //TODO pass whether to save the question
         let answer = `Not ready ${this.status}`;
+        let storyLocation = locationVi.textContent.substring(10);   // "Location: ".length
         if (this.status === 403 || this.status === 401) {
             answer = `Not allowed ${this.status}`;
         } else if (this.status === 200) {
@@ -85,7 +85,6 @@ function ask2() {
             storyLocation = response.answers[0].location
         }
         else if (this.status === 429) {
-            rateLimit();
             answer = "Rate limited";
         }
         hourglassVi.style.display = "none";
@@ -106,8 +105,37 @@ function callAskVi(msg, callback){
     request.send(JSON.stringify({"query":msg, "logQuestions": logQs.checked, "resetChat": false, "sessId": "Vi"}));
 }
 
-function rateLimit() {
-    //TODO
+function askViAgain() {
+    hourglassVi.style.display = "inline";
+    callAskLast("Vi", function() { //TODO pass whether to save the question
+        let answer = `Not ready ${this.status}`;
+        let storyLocation = locationVi.textContent.substring(10);   // "Location: ".length
+        if (this.status === 403 || this.status === 401) {
+            answer = `Not allowed ${this.status}`;
+        } else if (this.status === 200) {
+            let response = JSON.parse(this.response);
+            answer = response.answers[0].answer;
+            storyLocation = response.answers[0].location
+        }
+        else if (this.status === 429) {
+            answer = "Rate limited";
+        }
+        hourglassVi.style.display = "none";
+        insertMsg(msgYouVi, answer, chatVi);
+        locationVi.textContent = "Location: " + storyLocation
+        if (this.status === 403 || this.status === 401) {
+            window.location.href = "index.html";
+        }
+    });
+}
+
+function callAskLast(sessId, callback){
+    let request = new XMLHttpRequest();
+    request.open('POST', "AskLast", true);
+    request.setRequestHeader('Content-type', 'application/json');
+    request.withCredentials = true;
+    request.onload = callback;
+    request.send(JSON.stringify({"sessId": sessId}));
 }
 
 document.getElementById("query").addEventListener("keydown", function(e) {

@@ -17,6 +17,7 @@ Website:
  - handle bedrock session timeout after 1h
  done - add user-controlled session suffix - can be used to handle multiple, independent chats
  - catch error calling bedrock and return gracefully to the app
+ - handle 504 errors - ask for the last answer
 
 Loremaster:
  done - give the model the bigger index
@@ -24,7 +25,7 @@ Loremaster:
  do - test prompts with json-formatted sections
  - prompt manipulation:
    - storyteller style
-   - dialogue between a human and a bot)
+   - dialogue between a human and a bot
  create 2 prototypes:
    - use 5 previous contexts for question answering
    - rephrase the last question using the context of the dialogue
