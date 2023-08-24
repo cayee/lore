@@ -22,11 +22,25 @@ Loremaster:
  done - give the model the bigger index
  done - try the approach with an index made of different-sized chunks
  do - test prompts with json-formatted sections
+ - prompt manipulation:
+   - storyteller style
+   - dialogue between a human and a bot)
+ create 2 prototypes:
+   - use 5 previous contexts for question answering
+   - rephrase the last question using the context of the dialogue
+ 
 
 Vi & Jinx bots:
  - create input-output sets for fine-tuning
  done - test the approach with dumping all the text in one prompt
  do - add mechanism enabling the conversation between the user and the bot (use memory and trim the answers)
+
+Vi story:
+ 1) Piltover plaza:
+   - Rookie wants to join her on an adventure in the Ecliptic Vaults
+ 2) Ecliptic Vaults:
+   - Rookie and Vi investigate the crime scene
+
 
 Demo:
  - show the difference between clean Titan usage vs reinforcing it with embeddings

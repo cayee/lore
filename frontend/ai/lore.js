@@ -10,6 +10,7 @@ const hourglassVi   = document.querySelector("#hourglass2");
 const chatVi   = document.querySelector("#chatDiv2");
 const msgBotVi   = document.querySelector("#msgBot2");
 const msgYouVi   = document.querySelector("#msgYou2");
+const locationVi   = document.querySelector("#LocationVi");
 
 const debugFields = ["#contextQuestions", "#contextReturnNumber", "#promptPrefix", "#context", "#promptSuffix"]
 const cntxtQ = document.querySelector(debugFields[0]);
@@ -88,6 +89,7 @@ function ask2() {
         }
         hourglassVi.style.display = "none";
         insertMsg(msgYouVi, answer, chatVi);
+        locationVi.textContent = "Location: " + response.answers[0].location
 
         if (this.status === 403 || this.status === 401) {
             window.location.href = "index.html";
