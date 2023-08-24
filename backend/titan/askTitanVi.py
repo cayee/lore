@@ -106,6 +106,7 @@ def lambda_handler(event, _):
         print(f"After bedrock call: {bedrockEndTime}")
         print({"bedrockStartTime": bedrockStartTime, "bedrockEndTime": bedrockEndTime, "bedrockCallTime": bedrockEndTime - bedrockStartTime, "promptLength": len(prompt), "prompt": prompt})
         # cut everything out after the first 'Rookie' appearance
+        fullAnswer = generated_text
         ix = generated_text.find('Rookie:')
         if ix != -1:
             generated_text = generated_text[:ix]
@@ -115,7 +116,7 @@ def lambda_handler(event, _):
             location = "the Ecliptic Vaults"
             doReset = True
 
-        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "location": location})
+        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "location": location, "full_answer": fullAnswer})
 
     resp_json = {"answers": answers}
     if log_questions:
