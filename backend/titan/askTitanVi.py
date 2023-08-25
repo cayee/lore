@@ -108,7 +108,7 @@ def lambda_handler(event, _):
         
         #check the region
         if location == LOCATION_1:
-            region_response = call_bedrock(bedrock, f"This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie at the Ecliptic Vaults already? Answer 'Yes.' or 'No.'")
+            region_response = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie at the Ecliptic Vaults already? Answer 'Yes.' or 'No.'""")
             if region_response == "Yes.":
                 location = LOCATION_2
                 promptContext = """{["context": """
@@ -116,13 +116,13 @@ def lambda_handler(event, _):
                 promptContext += CONTEXT_SCENE_2
 
         elif location == LOCATION_2:
-            region_response = call_bedrock(bedrock, f"This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie at the Lanes already? Answer 'Yes.' or 'No.'")
+            region_response = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie at the Lanes already? Answer 'Yes.' or 'No.'""")
             if region_response == "Yes.":
                 location = LOCATION_3
                 promptContext = """{["context": """
                 promptContext += CONTEXT_SCENE_3
         else:
-            region_response = call_bedrock(bedrock, f"This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie in Piltover already? Answer 'Yes.' or 'No.'")
+            region_response = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie in Piltover already? Answer 'Yes.' or 'No.'""")
             if region_response == "Yes.":
                 location = LOCATION_1
                 promptContext = """{["context": """
