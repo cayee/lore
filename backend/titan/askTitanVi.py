@@ -112,7 +112,7 @@ def lambda_handler(event, _):
             controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie at the Ecliptic Vaults already? Answer 'Yes.' or 'No.'"""
             region_response = call_bedrock(bedrock, controlPrompt)
             controlReturn = "1_" + controlPrompt + "_" + region_response
-            if region_response == "Yes.":
+            if "yes" in region_response.lower():
                 location = LOCATION_2
                 promptContext = """{["context": """
                 promptContext += SUMMARY_SCENE_2
@@ -122,7 +122,7 @@ def lambda_handler(event, _):
             controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie at the Lanes already? Answer 'Yes.' or 'No.'"""
             region_response = call_bedrock(bedrock, controlPrompt)
             controlReturn = "2_" + controlPrompt + "_" + region_response
-            if region_response == "Yes.":
+            if "yes" in region_response.lower():
                 location = LOCATION_3
                 promptContext = """{["context": """
                 promptContext += CONTEXT_SCENE_3
@@ -130,7 +130,7 @@ def lambda_handler(event, _):
             controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie in Piltover already? Answer 'Yes.' or 'No.'"""
             region_response = call_bedrock(bedrock, controlPrompt)
             controlReturn = "3_" + controlPrompt + "_" + region_response
-            if region_response == "Yes.":
+            if "yes" in region_response.lower():
                 location = LOCATION_1
                 promptContext = """{["context": """
                 promptContext += CONTEXT_SCENE_1
