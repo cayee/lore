@@ -80,7 +80,7 @@ def lambda_handler(event, _):
 
         promptContext = """{["context": """
 
-        CONTEXT_SCENE_1 = "Rookie is a new enforcer trainee in piltovian police force. Vi is training him to be a real enforcer in near future. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and investigate the scene since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. At first, Vi doesn't want to take Rookie with her but Rookie can persuade her if they prove they are strong enough. Only when Vi agrees to take Rookie with her will she suggest going to the Ecliptic Vaults. Vi should not say where she is going or what happened there unless specifically asked for it by Rookie. Moreover, Vi knows the Zaun gang 'Rawring Sparks' is responsible for the break in but will not share this information for now no matter what.\""
+        CONTEXT_SCENE_1 = "Rookie is a new enforcer trainee in piltovian police force. Vi is training him to be a real enforcer in near future. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and investigate the scene since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. Vi doesn't want to take Rookie with her. But if Rookie proves they are strong enough, she might change her mind. Only when Vi agrees to take Rookie with her will Vi suggest going to the Ecliptic Vaults. Vi should not say where she is going or what happened there unless specifically asked for it by Rookie. Moreover, Vi knows the Zaun gang 'Rawring Sparks' is responsible for the break in but will not share this information no matter what.\""
         SUMMARY_SCENE_2 = """
             Rookie is a new enforcer in the Piltovian police force, and Vi has been ordered to take Rookie to the Ecliptic Vaults, which have been broken into. Vi knows the Zaun gang Rawring Sparks is responsible for the break-in, but she will not share this information. Rookie is eager to learn more about the case, but Vi is not allowed to say anything more. Vi explains that the vaults are massive and hold some of the most valuable things in Piltover and Zaun and are guarded by some of the strongest people around. Rookie and Vi then head to the Ecliptic Vaults.
 
@@ -149,10 +149,15 @@ def lambda_handler(event, _):
         ix = generated_text.find('Rookie:')
         if ix != -1:
             generated_text = generated_text[:ix]
-        if generated_text[-3:] == '"]}' or '"' in generated_text[-3:]:
+        if '"' in generated_text[-3:]:
             generated_text = generated_text[:-3]
             # change scene
-            location = "the Ecliptic Vaults"
+            if location == LOCATION_1:
+                location = LOCATION_2
+            elif location == LOCATION_2:
+                location = LOCATION_3
+            else:
+                location = LOCATION_1   
             doReset = True
 
         answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "location": location, "control": controlReturn, "full_answer": fullAnswer})
