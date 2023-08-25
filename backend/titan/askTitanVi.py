@@ -106,9 +106,12 @@ def lambda_handler(event, _):
         for q, a in zip(previousUserMessages, previousViResponses):
             promptStory += "Rookie: " + q + " Vi: " + a + " "
         
+        controlReturn = "K"
         #check the region
         if location == LOCATION_1:
-            region_response = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie at the Ecliptic Vaults already? Answer 'Yes.' or 'No.'""")
+            controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie at the Ecliptic Vaults already? Answer 'Yes.' or 'No.'"""
+            region_response = call_bedrock(bedrock, controlPrompt)
+            controlReturn = "1_" + controlPrompt + "_" + region_response
             if region_response == "Yes.":
                 location = LOCATION_2
                 promptContext = """{["context": """
@@ -116,13 +119,17 @@ def lambda_handler(event, _):
                 promptContext += CONTEXT_SCENE_2
 
         elif location == LOCATION_2:
-            region_response = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie at the Lanes already? Answer 'Yes.' or 'No.'""")
+            controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie at the Lanes already? Answer 'Yes.' or 'No.'"""
+            region_response = call_bedrock(bedrock, controlPrompt)
+            controlReturn = "2_" + controlPrompt + "_" + region_response
             if region_response == "Yes.":
                 location = LOCATION_3
                 promptContext = """{["context": """
                 promptContext += CONTEXT_SCENE_3
         else:
-            region_response = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie in Piltover already? Answer 'Yes.' or 'No.'""")
+            controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie in Piltover already? Answer 'Yes.' or 'No.'"""
+            region_response = call_bedrock(bedrock, controlPrompt)
+            controlReturn = "3_" + controlPrompt + "_" + region_response
             if region_response == "Yes.":
                 location = LOCATION_1
                 promptContext = """{["context": """
@@ -148,7 +155,7 @@ def lambda_handler(event, _):
             location = "the Ecliptic Vaults"
             doReset = True
 
-        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "location": location, "full_answer": fullAnswer})
+        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "location": location, "control": controlReturn, "full_answer": fullAnswer})
 
     resp_json = {"answers": answers}
     if log_questions:
