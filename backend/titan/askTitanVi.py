@@ -80,21 +80,19 @@ def lambda_handler(event, _):
 
         promptContext = """{["context": """
 
-        CONTEXT_SCENE_1 = "Rookie is a new enforcer trainee in piltovian police force. Vi is training him to be a real enforcer in near future. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and investigate the scene since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. Vi doesn't want to take Rookie with her. But if Rookie proves they are strong enough, she might change her mind. Only when Vi agrees to take Rookie with her will Vi suggest going to the Ecliptic Vaults. Vi should not say where she is going or what happened there unless specifically asked for it by Rookie. Moreover, Vi knows the Zaun gang 'Rawring Sparks' is responsible for the break in but will not share this information no matter what.\""
-        SUMMARY_SCENE_2 = """
-            Rookie is a new enforcer in the Piltovian police force, and Vi has been ordered to take Rookie to the Ecliptic Vaults, which have been broken into. Vi knows the Zaun gang Rawring Sparks is responsible for the break-in, but she will not share this information. Rookie is eager to learn more about the case, but Vi is not allowed to say anything more. Vi explains that the vaults are massive and hold some of the most valuable things in Piltover and Zaun and are guarded by some of the strongest people around. Rookie and Vi then head to the Ecliptic Vaults.
-
-            """
+        CONTEXT_SCENE_1 = "Rookie is a new enforcer trainee in piltovian police force. Vi is training him to be a real enforcer in near future. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and investigate the scene since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. Vi doesn't want to take Rookie with her. Only if Rookie proves they are strong enough, she might change her mind. Vi should not say where she is going or what happened there unless specifically asked for it by Rookie. Vi knows the Zaun gang 'Rawring Sparks' is responsible for the break in but will not share this information no matter what.\""
         CONTEXT_SCENE_2 = "Right now Rookie and Vi are at the Ecliptic Vaults. There is noone around but the main vault is in a bad shape. Vi and Rookie cannot go inside no matter what since the building is very unstable. There is a lot of junk lying around and among them there is a scrap of metal with a blue graffiti on it. Vi knows it is not Jinx's graffiti but rather Loxy's - one of the 'Rawring Sparks' gang member but will speak of it only if asked about the scrap. Vi cannot tell anything about the Rawring Sparks gang no matter what but eventually can be persuaded to say that Loxy is a part of some Zaun gang. When Rookie finds out about Loxy, Vi should suggest going to the Lanes as it is the very heart of Zaun."
         CONTEXT_SCENE_3 = "Rookie is a new enforcer in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and take Rookie with her since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. Vi should not say where they are going or what happened there unless asked. Moreover, Vi knows the Zaun gang 'Rawring Sparks' is responsible for the break in but will not share this information for now no matter what.\""
 
         # depending on the location
         if location == LOCATION_1:
+            promptContext += summary + " "
             promptContext += CONTEXT_SCENE_1
         elif location == LOCATION_2:
-            promptContext += SUMMARY_SCENE_2
+            promptContext += summary + " "
             promptContext += CONTEXT_SCENE_2 
         else:
+            promptContext += summary + " "
             promptContext += CONTEXT_SCENE_3
 
         promptStory = ", \"story\": \""
@@ -114,8 +112,9 @@ def lambda_handler(event, _):
             controlReturn = "1_" + controlPrompt + "_" + region_response
             if "yes" in region_response.lower():
                 location = LOCATION_2
+                summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Summarize the story.""")
                 promptContext = """{["context": """
-                promptContext += SUMMARY_SCENE_2
+                promptContext += summary + " "
                 promptContext += CONTEXT_SCENE_2
                 doReset = True
 
@@ -125,7 +124,9 @@ def lambda_handler(event, _):
             controlReturn = "2_" + controlPrompt + "_" + region_response
             if "yes" in region_response.lower():
                 location = LOCATION_3
+                summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Summarize the story.""")
                 promptContext = """{["context": """
+                promptContext += summary + " "
                 promptContext += CONTEXT_SCENE_3
                 doReset = True
                 
@@ -135,7 +136,9 @@ def lambda_handler(event, _):
             controlReturn = "3_" + controlPrompt + "_" + region_response
             if "yes" in region_response.lower():
                 location = LOCATION_1
+                summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Summarize the story.""")
                 promptContext = """{["context": """
+                promptContext += summary + " "
                 promptContext += CONTEXT_SCENE_1
                 doReset = True
 
@@ -164,7 +167,7 @@ def lambda_handler(event, _):
                 location = LOCATION_1   
             doReset = True
 
-        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "location": location, "control": controlReturn, "full_answer": fullAnswer})
+        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "location": location, "control": controlReturn, "full_answer": fullAnswer, "summary": summary})
 
     resp_json = {"answers": answers}
     if log_questions:
