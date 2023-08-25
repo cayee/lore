@@ -117,6 +117,7 @@ def lambda_handler(event, _):
                 promptContext = """{["context": """
                 promptContext += SUMMARY_SCENE_2
                 promptContext += CONTEXT_SCENE_2
+                doReset = True
 
         elif location == LOCATION_2:
             controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie at the Lanes already? Answer 'Yes.' or 'No.'"""
@@ -126,6 +127,8 @@ def lambda_handler(event, _):
                 location = LOCATION_3
                 promptContext = """{["context": """
                 promptContext += CONTEXT_SCENE_3
+                doReset = True
+                
         else:
             controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie in Piltover already? Answer 'Yes.' or 'No.'"""
             region_response = call_bedrock(bedrock, controlPrompt)
@@ -134,6 +137,7 @@ def lambda_handler(event, _):
                 location = LOCATION_1
                 promptContext = """{["context": """
                 promptContext += CONTEXT_SCENE_1
+                doReset = True
 
         prompt += promptContext + promptStory
         # beautify the response:
