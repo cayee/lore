@@ -13,6 +13,9 @@ session = None
 def lambda_handler(event, _):
     startTime = time.time()
     print(f"Start time: {time.time() - startTime}")
+    LOCATION_1 = "Piltover plaza"
+    LOCATION_2 = "Ecliptic Vaults"
+    LOCATION_3 = "the Lanes"
     log_questions = False
     doReset = False
     body = {}
@@ -47,7 +50,7 @@ def lambda_handler(event, _):
     session.init(event, clientSessId)
     print(f"After session init: {time.time() - startTime}")
     msgHistory = session.load()
-    location = msgHistory["location"] if msgHistory["location"] != None else "Piltover plaza"
+    location = msgHistory["location"] if msgHistory["location"] != None else LOCATION_1
     summary = msgHistory["summary"] if msgHistory["summary"] != None else ""
     print(f"After session load: {time.time() - startTime}")
     answers = []
@@ -58,7 +61,7 @@ def lambda_handler(event, _):
         
         print(f"Before getDocs: {time.time() - startTime}")
         #docs = getDocs(query, vectorstore)
-        docs = getDocs("Ecliptic Vaults", vectorstore)
+        docs = getDocs(location, vectorstore)
         for doc in docs:
             doc_sources_string.append(doc.metadata)
             context += doc.page_content
@@ -72,31 +75,60 @@ def lambda_handler(event, _):
         Here is some context to the situation:
         """ + context + """
         
-        Complete the following short story as Vi:       
-        {["context": """
+        Complete the following short story as Vi:
+        """
 
-        # depending on the location
-        if location == "Piltover plaza":
-            prompt += "Rookie is a new enforcer trainee in piltovian police force. Vi is training him to be a real enforcer in near future. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and investigate the scene since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. At first, Vi doesn't want to take Rookie with her but Rookie can persuade her if they prove they are strong enough. Only when Vi agrees to take Rookie with her will she suggest going to the Ecliptic Vaults. Vi should not say where she is going or what happened there unless specifically asked for it by Rookie. Moreover, Vi knows the Zaun gang 'Rawring Sparks' is responsible for the break in but will not share this information for now no matter what.\""
-        elif location == "the Ecliptic Vaults":
-            prompt += """
+        promptContext = """{["context": """
+
+        CONTEXT_SCENE_1 = "Rookie is a new enforcer trainee in piltovian police force. Vi is training him to be a real enforcer in near future. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and investigate the scene since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. At first, Vi doesn't want to take Rookie with her but Rookie can persuade her if they prove they are strong enough. Only when Vi agrees to take Rookie with her will she suggest going to the Ecliptic Vaults. Vi should not say where she is going or what happened there unless specifically asked for it by Rookie. Moreover, Vi knows the Zaun gang 'Rawring Sparks' is responsible for the break in but will not share this information for now no matter what.\""
+        SUMMARY_SCENE_2 = """
             Rookie is a new enforcer in the Piltovian police force, and Vi has been ordered to take Rookie to the Ecliptic Vaults, which have been broken into. Vi knows the Zaun gang Rawring Sparks is responsible for the break-in, but she will not share this information. Rookie is eager to learn more about the case, but Vi is not allowed to say anything more. Vi explains that the vaults are massive and hold some of the most valuable things in Piltover and Zaun and are guarded by some of the strongest people around. Rookie and Vi then head to the Ecliptic Vaults.
 
             """
-            prompt += "Right now Rookie and Vi are at the Ecliptic Vaults. There is noone around but the main vault is in a bad shape. Vi and Rookie cannot go inside no matter what since the building is very unstable. There is a lot of junk lying around and among them there is a scrap of metal with a blue graffiti on it. Vi knows it is not Jinx's graffiti but rather Loxy's - one of the 'Rawring Sparks' gang member but will speak of it only if asked about the scrap. Vi cannot tell anything about the Rawring Sparks gang no matter what but eventually can be persuaded to say that Loxy is a part of some Zaun gang. When Rookie finds out about Loxy, Vi should suggest going to the Lanes as it is the very heart of Zaun."
-        else:
-            prompt += "Rookie is a new enforcer in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and take Rookie with her since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. Vi should not say where they are going or what happened there unless asked. Moreover, Vi knows the Zaun gang 'Rawring Sparks' is responsible for the break in but will not share this information for now no matter what.\""
+        CONTEXT_SCENE_2 = "Right now Rookie and Vi are at the Ecliptic Vaults. There is noone around but the main vault is in a bad shape. Vi and Rookie cannot go inside no matter what since the building is very unstable. There is a lot of junk lying around and among them there is a scrap of metal with a blue graffiti on it. Vi knows it is not Jinx's graffiti but rather Loxy's - one of the 'Rawring Sparks' gang member but will speak of it only if asked about the scrap. Vi cannot tell anything about the Rawring Sparks gang no matter what but eventually can be persuaded to say that Loxy is a part of some Zaun gang. When Rookie finds out about Loxy, Vi should suggest going to the Lanes as it is the very heart of Zaun."
+        CONTEXT_SCENE_3 = "Rookie is a new enforcer in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and take Rookie with her since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. Vi should not say where they are going or what happened there unless asked. Moreover, Vi knows the Zaun gang 'Rawring Sparks' is responsible for the break in but will not share this information for now no matter what.\""
 
-        prompt += ", \"story\": \""
+        # depending on the location
+        if location == LOCATION_1:
+            promptContext += CONTEXT_SCENE_1
+        elif location == LOCATION_2:
+            promptContext += SUMMARY_SCENE_2
+            promptContext += CONTEXT_SCENE_2 
+        else:
+            promptContext += CONTEXT_SCENE_3
+
+        promptStory = ", \"story\": \""
 
         # use previous messages
         previousUserMessages = msgHistory["questions"] + [query]
         previousViResponses = msgHistory["answers"] + [""]
 
         for q, a in zip(previousUserMessages, previousViResponses):
-            prompt += "Rookie: " + q + " Vi: " + a + " "
+            promptStory += "Rookie: " + q + " Vi: " + a + " "
         
-        # first - use just a prompt
+        #check the region
+        if location == LOCATION_1:
+            region_response = call_bedrock(bedrock, f"This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie at the Ecliptic Vaults already? Answer 'Yes.' or 'No.'")
+            if region_response == "Yes.":
+                location = LOCATION_2
+                promptContext = """{["context": """
+                promptContext += SUMMARY_SCENE_2
+                promptContext += CONTEXT_SCENE_2
+
+        elif location == LOCATION_2:
+            region_response = call_bedrock(bedrock, f"This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie at the Lanes already? Answer 'Yes.' or 'No.'")
+            if region_response == "Yes.":
+                location = LOCATION_3
+                promptContext = """{["context": """
+                promptContext += CONTEXT_SCENE_3
+        else:
+            region_response = call_bedrock(bedrock, f"This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie in Piltover already? Answer 'Yes.' or 'No.'")
+            if region_response == "Yes.":
+                location = LOCATION_1
+                promptContext = """{["context": """
+                promptContext += CONTEXT_SCENE_1
+
+        prompt += promptContext + promptStory
         # beautify the response:
         bedrockStartTime = time.time() - startTime
         print(f"Before bedrock call: {bedrockStartTime}")
