@@ -1,13 +1,8 @@
 import json
 import time
 
-from ddbSession import ChatMessagesSession
+from ddbSession import ChatSession
 from askBedrock import connectToBedrock, getDocs, call_bedrock, modelId, textGenerationConfig
-
-from langchain.llms.bedrock import Bedrock
-from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferWindowMemory
-from langchain.vectorstores.base import VectorStoreRetriever
 
 is_cold_start = True
 bedrock = None
@@ -43,8 +38,8 @@ def lambda_handler(event, _):
     global is_cold_start, bedrock, vectorstores, session
 
     if is_cold_start:
-        bedrock, vectorstores = connectToBedrock(["/opt/index_faiss", "/opt/index_faiss_3"])
-        session = ChatMessagesSession()
+        bedrock, vectorstores = connectToBedrock(["/opt/index_faiss"])
+        session = ChatSession()
         is_cold_start = False
 
     print(f"Before session init: {time.time() - startTime}")
@@ -52,8 +47,6 @@ def lambda_handler(event, _):
     print(f"After session init: {time.time() - startTime}")
     msgHistory = session.load()
     print(f"After session load: {time.time() - startTime}")
-    llm = Bedrock(client=bedrock, model_id=modelId, model_kwargs=textGenerationConfig)
-    print(f"After Bedrock init: {time.time() - startTime}")
 
     if 'contextReturnNumber' not in body or body['contextReturnNumber'] == "":
         body['contextReturnNumber'] = 4
@@ -107,16 +100,6 @@ def lambda_handler(event, _):
         print({"bedrockStartTime": bedrockStartTime, "bedrockEndTime": bedrockEndTime, "bedrockCallTime": bedrockEndTime - bedrockStartTime, "promptLength": len(prompt), "prompt": prompt})
         answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt})
 
-    # use stored messages
-    memory = ConversationBufferWindowMemory(chat_memory=msgHistory, memory_key="chat_history", return_messages=True, human_prefix="Human:", ai_prefix="Bot:")
-    retriever = VectorStoreRetriever(vectorstore=vectorstores[0])
-    print(f"Before ConversationalRetrievalChain from llm: {time.time() - startTime}")
-    conversation_with_retrieval = ConversationalRetrievalChain.from_llm(llm, retriever, memory=memory)
-    print(f"After ConversationalRetrievalChain from llm: {time.time() - startTime}")
-    chat_response = conversation_with_retrieval({"question": query})
-    print(f"After conversation_with_retrieval: {time.time() - startTime}")
-    answers.append({"answer": chat_response['answer']})
-
     resp_json = {"answers": answers}
     if log_questions:
         print({"question": query, "answers": answers})
@@ -125,7 +108,7 @@ def lambda_handler(event, _):
     print(f"expr: {session.update_expression}")
     session.reset(False)
     print(f"expr: {session.update_expression}")
-    session.put(query, answers, memory)
+    session.put(query, answers)
     print(f"After session put: {time.time() - startTime}")
     return {
         'statusCode': 200,
