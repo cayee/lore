@@ -11,6 +11,7 @@ const chatVi   = document.querySelector("#chatDiv2");
 const msgBotVi   = document.querySelector("#msgBot2");
 const msgYouVi   = document.querySelector("#msgYou2");
 const locationVi   = document.querySelector("#LocationVi");
+const storyBackground   = document.querySelector("#StoryBackground");
 
 const debugFields = ["#contextQuestions", "#contextReturnNumber", "#promptPrefix", "#context", "#promptSuffix"]
 const cntxtQ = document.querySelector(debugFields[0]);
@@ -84,6 +85,14 @@ function handleViResponse() {
     hourglassVi.style.display = "none";
     insertMsg(msgYouVi, answer, chatVi);
     locationVi.textContent = "Location: " + storyLocation
+    if (storyLocation == "Piltover plaza") {
+        storyBackground.src = "../img/Piltover.jpg"
+    } else if (storyBackground == "Ecliptic Vaults") {
+        storyBackground.src = "../img/Vaults.jpg"
+    } else if (storyBackground == "the Lanes") {
+        storyBackground.src = "../img/Zaun.jpg"
+    }
+    
     if (this.status === 403 || this.status === 401) {
         window.location.href = "index.html";
     }

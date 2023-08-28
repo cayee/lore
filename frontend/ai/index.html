@@ -99,7 +99,7 @@
     </div>
     <div style="text-align: left;">
         <p>Prompt prefix:</p>
-        <input type="text" class="queryStyle" id="promptPrefix" value="Use the following pieces of context to answer the question at the end. "></input>
+        <input type="text" class="queryStyle" id="promptPrefix" value=""></input>
         <button class="askQButton" onclick="ask()"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
     </div>
     <div style="text-align: left;">
@@ -118,30 +118,35 @@
 
 <h3 class="subTitle">Adventure with Vi</h3>
 <h4 id="LocationVi" class="subTitle">Location: Piltover plaza</h4>
-<div id="chatDiv2" style="width: 300px; height: 300px; max-height: 300px; overflow-y: scroll">
-    <div hidden>
-        <div class="message" id="msgBot2">
-            <div class="message__outer" style="flex-direction: row-reverse">
-                <div class="message__avatar">
-                    <img class="avatar" src="../ico/Piltover_Crest_icon.webp" width="28" height="28">
+<div style="display: grid; grid-template-columns: 400px 400px;">
+    <div id="chatDiv2" style="width: 300px; height: 300px; max-height: 300px; overflow-y: scroll">
+        <div hidden>
+            <div class="message" id="msgBot2">
+                <div class="message__outer" style="flex-direction: row-reverse">
+                    <div class="message__avatar">
+                        <img class="avatar" src="../ico/Piltover_Crest_icon.webp" width="28" height="28">
+                    </div>
+                    <div class="message__inner" style="flex-direction: row-reverse">
+                        <div class="message__bubble" style="background-color: #f0e8e8; color: rgb(30,30,33);">Hello!</div>
+                    </div>
+                    <div class="message__status"></div>
                 </div>
-                <div class="message__inner" style="flex-direction: row-reverse">
-                    <div class="message__bubble" style="background-color: #f0e8e8; color: rgb(30,30,33);">Hello!</div>
+            </div>
+            <div class="message" id="msgYou2">
+                <div class="message__outer" style="flex-direction: row">
+                    <div class="message__avatar">
+                        <img class="avatar" src="../ico/vi_icon.jpg" width="28" height="28">
+                    </div>
+                    <div class="message__inner">
+                        <div class="message__bubble" style="background-color: rgb(30, 30, 33);">Veeery loong text about anything but nothing else!</div>
+                    </div>
+                    <div class="message__status"></div>
                 </div>
-                <div class="message__status"></div>
             </div>
         </div>
-        <div class="message" id="msgYou2">
-            <div class="message__outer" style="flex-direction: row">
-                <div class="message__avatar">
-                    <img class="avatar" src="../ico/vi_icon.jpg" width="28" height="28">
-                </div>
-                <div class="message__inner">
-                    <div class="message__bubble" style="background-color: rgb(30, 30, 33);">Veeery loong text about anything but nothing else!</div>
-                </div>
-                <div class="message__status"></div>
-            </div>
-        </div>
+    </div>
+    <div>
+        <img id="StoryBackground" style="width: 100%; height: 100%" src="../img/Vaults.jpg"/>
     </div>
 </div>
 

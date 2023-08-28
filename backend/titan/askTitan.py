@@ -63,12 +63,19 @@ def lambda_handler(event, _):
         except:
             body['contextReturnNumber'] = 4
 
+    if 'promptPrefix' not in body or body['promptPrefix'] == "":
+        body['promptPrefix'] = """You are an assistant helping Human understand the Runeterra world. Complete the following dialogue using the context provided. If the answer is not related to the context, say that you cannot answer the question. {["context":"""
+        
+        
+    previousUserMessages = msgHistory["questions"] + [query]
+    previousBotResponses = msgHistory["answers"] + [""]
     if 'promptSuffix' not in body or body['promptSuffix'] == "":
-        body['promptSuffix'] = f"""Question: {query}
-            Answer:"""
+        body['promptSuffix'] = f""", "dialogue":\""""
+        for q, a in zip(previousUserMessages, previousBotResponses):
+            body['promptSuffix'] += " Human: " + q + " Bot: " + a
 
     if 'contextQuestions' not in body or body['contextQuestions'] == "":
-        contextQuestions = [query]
+        contextQuestions = previousUserMessages if len(previousUserMessages) <= 6 else previousUserMessages [-6:]
     else:
         contextQuestions = body['contextQuestions'].split('_')
 
@@ -89,12 +96,7 @@ def lambda_handler(event, _):
         if 'context' in body and body['context'] != "":
             context = body["context"]
 
-        prompt = f"""{body['promptPrefix'] if 'promptPrefix' in body else ''}
-    
-        {context}
-        
-        {body['promptSuffix']}
-        """
+        prompt = f"""{body['promptPrefix']} {context} {body['promptSuffix']}"""
 
         # first - use just a prompt
         bedrockStartTime = time.time() - startTime
