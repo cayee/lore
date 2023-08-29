@@ -87,12 +87,12 @@ function handleViResponse() {
     locationVi.textContent = "Location: " + storyLocation
     if (storyLocation == "Piltover plaza") {
         storyBackground.src = "../img/Piltover.jpg"
-    } else if (storyBackground == "Ecliptic Vaults") {
+    } else if (storyLocation == "Ecliptic Vaults") {
         storyBackground.src = "../img/Vaults.jpg"
-    } else if (storyBackground == "the Lanes") {
+    } else if (storyLocation == "the Lanes") {
         storyBackground.src = "../img/Zaun.jpg"
     }
-    
+
     if (this.status === 403 || this.status === 401) {
         window.location.href = "index.html";
     }
@@ -116,5 +116,12 @@ document.getElementById("query").addEventListener("keydown", function(e) {
     // Enter is pressed
     if (e.code === "Enter") {
         document.getElementById("AskQButton").click()
+    }
+}, false);
+
+document.getElementById("query2").addEventListener("keydown", function(e) {
+    // Enter is pressed
+    if (e.code === "Enter") {
+        document.getElementById("AskQButton2").click()
     }
 }, false);
