@@ -34,6 +34,8 @@ Vi & Jinx bots:
  - create input-output sets for fine-tuning
  done - test the approach with dumping all the text in one prompt
  do - add mechanism enabling the conversation between the user and the bot (use memory and trim the answers)
+ - scenes and acts
+ - points for each act (subtasks)
 
 Vi story:
  1) Piltover plaza:

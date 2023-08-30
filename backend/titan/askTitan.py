@@ -57,7 +57,7 @@ def lambda_handler(event, _):
             body['contextReturnNumber'] = 4
 
     if 'promptPrefix' not in body or body['promptPrefix'] == "":
-        body['promptPrefix'] = """You are an assistant helping Human understand the Runeterra world. Complete the following dialogue using the context provided. If the answer is not related to the context, say that you cannot answer the question. {["context":"""
+        body['promptPrefix'] = """You are an assistant helping Human understand the Runeterra world. Complete the following dialogue using the context provided. If the answer is not related to the context or the Runeterra world, say that you cannot answer the question. Unless specified, use around 4 sentences to answer the question. {["context":"""
         
         
     previousUserMessages = msgHistory["questions"] + [query]

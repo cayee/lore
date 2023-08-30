@@ -9,7 +9,7 @@ modelId = "amazon.titan-tg1-large"
 textGenerationConfig = {
     "maxTokenCount": 4096,
     "stopSequences": [],
-    "temperature": 0.5,
+    "temperature": 0.0,
     "topP": 0.2,
 }
 
