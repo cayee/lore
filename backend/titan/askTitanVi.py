@@ -81,8 +81,8 @@ def lambda_handler(event, _):
         promptContext = """{["context": """
 
         CONTEXT_SCENE_1 = "Rookie is a new enforcer trainee in piltovian police force. Vi is training him to be a real enforcer in near future. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and investigate the scene since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. Nobody knows if anything has been stolen, that's for the Vi to find out. Vi doesn't want to take Rookie with her. Only if Rookie proves they are strong enough, she might change her mind. Vi doesn't know who is behind the break in and will doubt every theory regarding who might have done it."
-        CONTEXT_SCENE_2 = "Right now Rookie and Vi are at the Ecliptic Vaults. There is noone around but the main vault is in a bad shape and looks as if it could collapse any minute. Vi and Rookie cannot go inside no matter what since the building is very unstable. There is a lot of junk lying around and among them there is a scrap of metal with a blue graffiti on it. Vi recognizes the graffiti to be Loxy's - one of the 'Rawring Sparks' gang member. The Rawring Sparks have been causing mischeif in Piltover more and more often recently/ When Rookie finds out about Loxy, Vi should suggest going to the Lanes as it is the very heart of Zaun."
-        CONTEXT_SCENE_3 = "Rookie and Vi arrive to the Lanes. At first, Vi suggest going to the local bar 'The Last Crop' to ask locals for some information regarding 'Rawring Sparks'. However, on the way to the bar a loud exploosion is heard and a flash of blue light errupts in an alley nearby. Vi and Rookie run towards it but when they reach the destination, unexpected guests await them. When Rookie and Vi meet the guests, Vi should only respond with 'TO BE CONTINUED...' and nothing else."
+        CONTEXT_SCENE_2 = "Right now Rookie and Vi are at the Ecliptic Vaults. There is noone around but the main vault is in a bad shape and looks as if it could collapse any minute. Vi and Rookie cannot go inside no matter what since the building is very unstable. There is a lot of junk lying around and among them there is a scrap of metal with a blue graffiti on it. Vi recognizes the graffiti to be Loxy's - one of the 'Rawring Sparks' gang member. Loxy is the mastermind behind the Rawring Sparks operations. The Rawring Sparks have been causing mischeif in Piltover more and more often recently. When Rookie finds out about Loxy, Vi should suggest going to the Lanes as it is the very heart of Zaun."
+        CONTEXT_SCENE_3 = "Rookie and Vi arrive to the Lanes in Zaun. At first, Vi suggest going to the local bar 'The Last Crop' to ask locals for some information regarding 'Rawring Sparks'. However, on the way to the bar a loud exploosion is heard and a flash of blue light errupts in an alley nearby. Vi and Rookie run towards it but when they reach the destination, unexpected guests await them. When Rookie and Vi meet the guests, Vi should only respond with 'TO BE CONTINUED...' and nothing else."
 
         # depending on the location
         if location == LOCATION_1:
@@ -131,7 +131,7 @@ def lambda_handler(event, _):
                 doReset = True
                 
         else:
-            controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie in Piltover already? Answer 'Yes.' or 'No.'"""
+            controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Are Vi and Rookie in Shurima already? Answer 'Yes.' or 'No.'"""
             region_response = call_bedrock(bedrock, controlPrompt)
             controlReturn = "3_" + controlPrompt + "_" + region_response
             if "yes" in region_response.lower():
@@ -175,7 +175,8 @@ def lambda_handler(event, _):
 
     print(f"Before session put: {time.time() - startTime}")
     session.reset(doReset)
-    session.put(query, answers, location, summary)
+    if "Sorry - this model" not in generated_text:
+        session.put(query, answers, location, summary)
     print(f"After session put: {time.time() - startTime}")
     return {
         'statusCode': 200,
