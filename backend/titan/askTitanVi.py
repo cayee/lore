@@ -75,7 +75,7 @@ def lambda_handler(event, _):
         Here is some context to the situation:
         """ + context + """
         
-        Complete the following short story as Vi:
+        Vi should not say more then 3 sentences in a response. Complete the following short story as Vi:
         """
 
         promptContext = """{["context": """
