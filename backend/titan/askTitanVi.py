@@ -81,7 +81,7 @@ def lambda_handler(event, _):
         promptContext = """{["context": """
 
         CONTEXT_SCENE_1 = "Rookie is a new enforcer trainee in piltovian police force. Vi is training him to be a real enforcer in near future. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and investigate the scene since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. Nobody knows if anything has been stolen, that's for the Vi to find out. Vi doesn't want to take Rookie with her. Only if Rookie proves they are strong enough, she might change her mind. Vi doesn't know who is behind the break in and will doubt every theory regarding who might have done it."
-        CONTEXT_SCENE_2 = "Right now Rookie and Vi are at the Ecliptic Vaults. There is noone around but the main vault is in a bad shape and looks as if it could collapse any minute because of the explosion that happened a few hours ago. Vi and Rookie cannot go inside no matter what since the building is very unstable. There is a lot of junk lying around and among them there is a scrap of metal with a blue graffiti on it. Vi recognizes the graffiti to be Loxy's - one of the 'Rawring Sparks' gang member. Loxy is the mastermind behind the Rawring Sparks operations. The Rawring Sparks have been causing mischeif in Piltover more and more often recently. When Rookie finds out about Loxy, Vi should suggest going to the Lanes together with Rookie as it is the very heart of Zaun."
+        CONTEXT_SCENE_2 = "Right now Rookie and Vi are at the Ecliptic Vaults. There is noone around but the main vault is in a bad shape and looks as it was damaged in an attempted break-in. Vi and Rookie cannot go inside no matter what since the building is very unstable. The thieves didn't manage to break through and didn't steal anything. There is a lot of junk lying around and among them there is a scrap of metal with a blue graffiti on it. Vi recognizes the graffiti to be Loxy's - one of the 'Rawring Sparks' gang member. Loxy is the mastermind behind the Rawring Sparks operations. The Rawring Sparks have been causing mischeif in Piltover more and more often recently. When Rookie finds out about Loxy, Vi should suggest going to the Lanes together with Rookie as it is the very heart of Zaun."
         CONTEXT_SCENE_3 = "Rookie and Vi arrive to the Lanes in Zaun. At first, Vi suggest going to the local bar 'The Last Crop' to ask locals for some information regarding 'Rawring Sparks'. However, on the way to the bar a loud exploosion is heard and a flash of blue light errupts in an alley nearby. Vi and Rookie run towards it but when they reach the destination, unexpected guests await them. When Rookie and Vi meet the guests, Vi should only respond with 'TO BE CONTINUED...' and nothing else."
 
         # depending on the location
@@ -112,7 +112,7 @@ def lambda_handler(event, _):
             controlReturn = "1_" + controlPrompt + "_" + region_response
             if "yes" in region_response.lower():
                 location = LOCATION_2
-                summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Summarize the story.""")
+                summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{[' + promptStory[2:]+'"]}'}. Summarize the story.""")
                 promptContext = """{["context": """
                 promptContext += summary + " "
                 promptContext += CONTEXT_SCENE_2
@@ -124,7 +124,7 @@ def lambda_handler(event, _):
             controlReturn = "2_" + controlPrompt + "_" + region_response
             if "yes" in region_response.lower():
                 location = LOCATION_3
-                summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Summarize the story.""")
+                summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{[' + promptStory[2:]+'"]}'}. Summarize the story.""")
                 promptContext = """{["context": """
                 promptContext += summary + " "
                 promptContext += CONTEXT_SCENE_3
@@ -136,7 +136,7 @@ def lambda_handler(event, _):
             controlReturn = "3_" + controlPrompt + "_" + region_response
             if "yes" in region_response.lower():
                 location = LOCATION_1
-                summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"]}'}. Summarize the story.""")
+                summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{[' + promptStory[2:]+'"]}'}. Summarize the story.""")
                 promptContext = """{["context": """
                 promptContext += summary + " "
                 promptContext += CONTEXT_SCENE_1
@@ -156,7 +156,7 @@ def lambda_handler(event, _):
         ix = generated_text.find('Rookie:')
         if ix != -1:
             generated_text = generated_text[:ix]
-        if '"' in generated_text[-3:] or '}' in generated_text[-3:] or fullAnswer == generated_text:
+        if ('"' in generated_text[-3:] or '}' in generated_text[-3:] or fullAnswer == generated_text) and "Sorry - this model" not in generated_text:
             generated_text = generated_text[:-3]
             # change scene
             if location == LOCATION_1:
