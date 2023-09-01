@@ -68,7 +68,7 @@ def lambda_handler(event, _):
             body['promptSuffix'] += " Human: " + q + " Bot: " + a
 
     if 'contextQuestions' not in body or body['contextQuestions'] == "":
-        contextQuestions = previousUserMessages if len(previousUserMessages) <= 6 else previousUserMessages [-6:]
+        contextQuestions = previousUserMessages if len(previousUserMessages) <= 3 else previousUserMessages [-3:]
     else:
         contextQuestions = body['contextQuestions'].split('_')
 
