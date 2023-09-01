@@ -64,7 +64,7 @@ def lambda_handler(event, _):
     previousBotResponses = msgHistory["answers"] + [""]
     if 'promptSuffix' not in body or body['promptSuffix'] == "":
         body['promptSuffix'] = f""", "dialogue":\""""
-        for q, a in zip(previousUserMessages, previousBotResponses):
+        for q, a in zip(previousUserMessages[-3:], previousBotResponses[-3:]):
             body['promptSuffix'] += " Human: " + q + " Bot: " + a
 
     if 'contextQuestions' not in body or body['contextQuestions'] == "":
