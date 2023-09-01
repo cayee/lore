@@ -85,11 +85,11 @@ function handleViResponse() {
     hourglassVi.style.display = "none";
     insertMsg(msgYouVi, answer, chatVi);
     locationVi.textContent = "Location: " + storyLocation
-    if (storyLocation == "Piltover plaza") {
+    if (storyLocation === "Piltover plaza") {
         storyBackground.src = "../img/Piltover.jpg"
-    } else if (storyLocation == "Ecliptic Vaults") {
+    } else if (storyLocation === "Ecliptic Vaults") {
         storyBackground.src = "../img/Vaults.jpg"
-    } else if (storyLocation == "the Lanes") {
+    } else if (storyLocation === "the Lanes") {
         storyBackground.src = "../img/Zaun.jpg"
     }
 
