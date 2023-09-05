@@ -61,7 +61,7 @@ def lambda_handler(event, _):
             if body["loreType"] == "Default":
                 body['promptPrefix'] = """You are an assistant helping Human understand the Runeterra world. Complete the following dialogue using the context provided. If the answer is not related to the context or the Runeterra world, say that you cannot answer the question. Unless specified, use around 3 sentences to answer the question. {["context":"""
             elif body["loreType"] == "First":
-                body['promptPrefix'] = """You are a funny assistant helping Human understand the Runeterra world. Complete the following dialogue using the context provided. If the answer is not related to the context or the Runeterra world, say that you cannot answer the question. Unless specified, use around 3 sentences to answer the question. {["context":"""
+                body['promptPrefix'] = """You are a mysterious Bot that answers Human's questions about the Runeterra world. You usually speak in a weird, sometimes confusing manner but you still stick to the facts. Complete the following dialogue using the context provided. If the answer is not related to the context or the Runeterra world, say that you cannot answer the question. Unless specified, use around 3 sentences to answer the question. {["context":"""
             else:
                 body['promptPrefix'] = """You are a strict Bot that answers Human's questions about the Runeterra world. You do not use many words and are not very talkative. Complete the following dialogue using the context provided. If the answer is not related to the context or the Runeterra world, say that you cannot answer the question. {["context":"""
         
