@@ -1,9 +1,5 @@
-const userQuery   = document.querySelector("#query");
-const hourglass   = document.querySelector("#hourglass");
-const chat   = document.querySelector("#chatDiv");
-const msgBot   = document.querySelector("#msgBot");
-const msgYou   = document.querySelector("#msgYou");
 const logQs   = document.querySelector("#LogQuestions");
+const sendAll   = document.querySelector("#SendAll");
 
 const userQueryVi   = document.querySelector("#query2");
 const hourglassVi   = document.querySelector("#hourglass2");
@@ -39,34 +35,47 @@ function postAsk(api, data, callback) {
     request.send(JSON.stringify(data));
 }
 
-function ask() {
-    const question = userQuery.value;
+function ask(suff) {
+    const question = document.querySelector("#query"+suff).value;
     if (question.length < 1) return;
 
-    hourglass.style.display = "inline";
-    insertMsg(msgBot, question, chat, true);
+    const chats = sendAll.checked ? ['', '-2', '-3']: [suff];
+    const loreTypes = ["Default", "First", "Second"];
 
-    postAsk("AskLore", {"query":question, "logQuestions": logQs.checked,
-        "contextQuestions": cntxtQ.value, "contextReturnNumber": cntxtNumber.value, "promptPrefix": prptPre.value,
-        "context": cntxtField.value, "promptSuffix": prptSuf.value, "sessId": "Lore"},
-        function() { //TODO pass whether to save the question
-            let answer = `Not ready ${this.status}`;
-            if (this.status === 403 || this.status === 401) {
-                answer = `Not allowed ${this.status}`;
-            } else if (this.status === 200) {
-                let response = JSON.parse(this.response);
-                answer = response.answers[0].answer;
-            }
-            else if (this.status === 429) {
-                answer = "Rate limited";
-            }
-            hourglass.style.display = "none";
-            insertMsg(msgYou, answer, chat);
+    for (suffId in chats) {
+        suff = chats[suffId];
 
-            if (this.status === 403 || this.status === 401) {
-                window.location.href = "index.html";
-            }
-    });
+        let hourglass = document.querySelector("#hourglass" + suff);
+        let msgBot = document.querySelector("#msgBot" + suff);
+        let msgYou = document.querySelector("#msgYou" + suff);
+        let chat = document.querySelector("#chatDiv" + suff);
+        hourglass.style.display = "inline";
+        insertMsg(msgBot, question, chat, true);
+
+        postAsk("AskLore", {
+                "query": question, "logQuestions": logQs.checked,
+                "contextQuestions": cntxtQ.value, "contextReturnNumber": cntxtNumber.value, "promptPrefix": prptPre.value,
+                "context": cntxtField.value, "promptSuffix": prptSuf.value,
+                "sessId": "Lore" + suff, "loreType": loreTypes[suffId]
+            },
+            function () {
+                let answer = `Not ready ${this.status}`;
+                if (this.status === 403 || this.status === 401) {
+                    answer = `Not allowed ${this.status}`;
+                } else if (this.status === 200) {
+                    let response = JSON.parse(this.response);
+                    answer = response.answers[0].answer;
+                } else if (this.status === 429) {
+                    answer = "Rate limited";
+                }
+                hourglass.style.display = "none";
+                insertMsg(msgYou, answer, chat);
+
+                if (this.status === 403 || this.status === 401) {
+                    window.location.href = "index.html";
+                }
+            });
+    };
 }
 
 function handleViResponse() {
@@ -112,16 +121,13 @@ function askViAgain() {
     postAsk("AskLast", {"sessId": "Vi"}, handleViResponse)
 }
 
-document.getElementById("query").addEventListener("keydown", function(e) {
-    // Enter is pressed
-    if (e.code === "Enter") {
-        document.getElementById("AskQButton").click()
-    }
-}, false);
+function actOnEnter(but) {
+    document.getElementById("query").addEventListener("keydown", function(e) {
+        if (e.code === "Enter") document.getElementById(but).click()
+    }, false);
+}
 
-document.getElementById("query2").addEventListener("keydown", function(e) {
-    // Enter is pressed
-    if (e.code === "Enter") {
-        document.getElementById("AskQButton2").click()
-    }
-}, false);
+actOnEnter("AskQButton")
+actOnEnter("AskQButton2")
+actOnEnter("AskQButton-2")
+actOnEnter("AskQButton-3")

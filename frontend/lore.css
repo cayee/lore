@@ -34,16 +34,12 @@ body {
     color: #f0e6d2;
 }
 
-#QuestionP {
+.checkLol {
     font-family: "Beaufort for LOL", Arial, sans-serif;
     color: #c8aa6e;
 }
 
-#AskQButton {
-    height: 38px; width: 38px; vertical-align: middle; background-color: #221E1F; border-color: #221E1F
-}
-
-.askQButton {
+.askbutton {
     height: 38px; width: 38px; vertical-align: middle; background-color: #221E1F; border-color: #221E1F
 }
 

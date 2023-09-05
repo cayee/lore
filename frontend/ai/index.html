@@ -29,9 +29,13 @@
 <body>
 <h2 id="MainH">League of Legends Loremaster v0.1</h2>
 <div>
-    <p id="QuestionP">
+    <p class="checkLol">
         <input id="LogQuestions" type="checkbox" checked="true"/>
         Save my Q&A for future training purposes
+    </p>
+    <p class="checkLol">
+        <input id="SendAll" type="checkbox" checked="true"/>
+        Send to all Loremasters
     </p>
 </div>
 <div>
@@ -52,65 +56,136 @@
     </select>
 </div>
 <br>
-<h3 class="subTitle">Loremaster</h3>
-<div id="chatDiv" style="width: 300px; height: 300px; max-height: 300px; overflow-y: scroll">
-    <div hidden>
-        <div class="message" id="msgBot">
-            <div class="message__outer" style="flex-direction: row-reverse">
-                <div class="message__avatar">
-                    <img class="avatar" src="../ico/Icon1.webp" width="28" height="28">
+<div style="display:flex">
+    <div style="flex:1">
+        <h3 class="subTitle">Loremaster</h3>
+        <div id="chatDiv" style="width: 300px; height: 300px; max-height: 300px; overflow-y: scroll">
+            <div hidden>
+                <div class="message" id="msgBot">
+                    <div class="message__outer" style="flex-direction: row-reverse">
+                        <div class="message__avatar">
+                            <img class="avatar" src="../ico/Icon1.webp" width="28" height="28">
+                        </div>
+                        <div class="message__inner" style="flex-direction: row-reverse">
+                            <div class="message__bubble" style="background-color: #f0e8e8; color: rgb(30,30,33);">Hello!</div>
+                        </div>
+                        <div class="message__status"></div>
+                    </div>
                 </div>
-                <div class="message__inner" style="flex-direction: row-reverse">
-                    <div class="message__bubble" style="background-color: #f0e8e8; color: rgb(30,30,33);">Hello!</div>
+                <div class="message" id="msgYou">
+                    <div class="message__outer" style="flex-direction: row">
+                        <div class="message__avatar">
+                            <img class="avatar" src="../ico/LoL_Icon_Flat_GOLD.png" width="28" height="28">
+                        </div>
+                        <div class="message__inner">
+                            <div class="message__bubble" style="background-color: rgb(30, 30, 33);">Veeery loong text about anything but nothing else!</div>
+                        </div>
+                        <div class="message__status"></div>
+                    </div>
                 </div>
-                <div class="message__status"></div>
             </div>
         </div>
-        <div class="message" id="msgYou">
-            <div class="message__outer" style="flex-direction: row">
-                <div class="message__avatar">
-                    <img class="avatar" src="../ico/LoL_Icon_Flat_GOLD.png" width="28" height="28">
-                </div>
-                <div class="message__inner">
-                    <div class="message__bubble" style="background-color: rgb(30, 30, 33);">Veeery loong text about anything but nothing else!</div>
-                </div>
-                <div class="message__status"></div>
-            </div>
+        <div style="text-align: left;">
+            <input type="text" id="query" placeholder="Message..."></input>
+            <button class="askbutton" id="AskQButton" onclick="ask('')"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
+            <img id="hourglass" src="../ico/zhonyas_old.webp" width="30" height="30" style="display: none; vertical-align:middle">
         </div>
     </div>
-</div>
-
-<div style="text-align: left;">
-    <input type="text" id="query" placeholder="Message..."></input>
-    <button id="AskQButton" onclick="ask()"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
-    <img id="hourglass" src="../ico/zhonyas_old.webp" width="30" height="30" style="display: none; vertical-align:middle">
+    <div style="flex:1">
+        <h3 class="subTitle">Loremaster 2</h3>
+        <div id="chatDiv-2" style="width: 300px; height: 300px; max-height: 300px; overflow-y: scroll">
+            <div hidden>
+                <div class="message" id="msgBot-2">
+                    <div class="message__outer" style="flex-direction: row-reverse">
+                        <div class="message__avatar">
+                            <img class="avatar" src="../ico/Icon1.webp" width="28" height="28">
+                        </div>
+                        <div class="message__inner" style="flex-direction: row-reverse">
+                            <div class="message__bubble" style="background-color: #f0e8e8; color: rgb(30,30,33);">Hello!</div>
+                        </div>
+                        <div class="message__status"></div>
+                    </div>
+                </div>
+                <div class="message" id="msgYou-2">
+                    <div class="message__outer" style="flex-direction: row">
+                        <div class="message__avatar">
+                            <img class="avatar" src="../ico/LoL_Icon_Flat_GOLD.png" width="28" height="28">
+                        </div>
+                        <div class="message__inner">
+                            <div class="message__bubble" style="background-color: rgb(30, 30, 33);">Veeery loong text about anything but nothing else!</div>
+                        </div>
+                        <div class="message__status"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: left;">
+            <input type="text" id="query-2" placeholder="Message..."></input>
+            <button class="askbutton" id="AskQButton-2" onclick="ask('-2')"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
+            <img id="hourglass-2" src="../ico/zhonyas_old.webp" width="30" height="30" style="display: none; vertical-align:middle">
+        </div>
+    </div>
+    <div style="flex:1">
+        <h3 class="subTitle">Loremaster 3</h3>
+        <div id="chatDiv-3" style="width: 300px; height: 300px; max-height: 300px; overflow-y: scroll">
+            <div hidden>
+                <div class="message" id="msgBot-3">
+                    <div class="message__outer" style="flex-direction: row-reverse">
+                        <div class="message__avatar">
+                            <img class="avatar" src="../ico/Icon1.webp" width="28" height="28">
+                        </div>
+                        <div class="message__inner" style="flex-direction: row-reverse">
+                            <div class="message__bubble" style="background-color: #f0e8e8; color: rgb(30,30,33);">Hello!</div>
+                        </div>
+                        <div class="message__status"></div>
+                    </div>
+                </div>
+                <div class="message" id="msgYou-3">
+                    <div class="message__outer" style="flex-direction: row">
+                        <div class="message__avatar">
+                            <img class="avatar" src="../ico/LoL_Icon_Flat_GOLD.png" width="28" height="28">
+                        </div>
+                        <div class="message__inner">
+                            <div class="message__bubble" style="background-color: rgb(30, 30, 33);">Veeery loong text about anything but nothing else!</div>
+                        </div>
+                        <div class="message__status"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: left;">
+            <input type="text" id="query-3" placeholder="Message..."></input>
+            <button class="askbutton" id="AskQButton-3" onclick="ask('-3')"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
+            <img id="hourglass-3" src="../ico/zhonyas_old.webp" width="30" height="30" style="display: none; vertical-align:middle">
+        </div>
+    </div>
 </div>
 
 <div hidden>
     <div style="text-align: left;">
         <p>Texts used for context:</p>
         <input type="text" class="queryStyle" id="contextQuestions" value=""></input>
-        <button class="askQButton" onclick="ask()"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
+        <button class="askbutton" onclick="ask()"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
     </div>
     <div style="text-align: left;">
         <p>Number of returned context documents:</p>
         <input type="text" class="queryStyle" id="contextReturnNumber" value="4"></input>
-        <button class="askQButton" onclick="ask()"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
+        <button class="askbutton" onclick="ask()"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
     </div>
     <div style="text-align: left;">
         <p>Prompt prefix:</p>
         <input type="text" class="queryStyle" id="promptPrefix" value=""></input>
-        <button class="askQButton" onclick="ask()"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
+        <button class="askbutton" onclick="ask()"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
     </div>
     <div style="text-align: left;">
         <p>Context:</p>
         <input type="text" class="queryStyle" id="context" value=""></input>
-        <button class="askQButton" onclick="ask()"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
+        <button class="askbutton" onclick="ask()"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
     </div>
     <div style="text-align: left;">
         <p>Prompt sufix:</p>
         <input type="text" class="queryStyle" id="promptSuffix" value=""></input>
-        <button class="askQButton" onclick="ask()"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
+        <button class="askbutton" onclick="ask()"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
     </div>
 </div>
 
@@ -151,9 +226,9 @@
 </div>
 
 <div style="text-align: left;">
-    <button id="RetryVi" class="askQButton" onclick="askViAgain()">R</button>
+    <button id="RetryVi" class="askbutton" onclick="askViAgain()">R</button>
     <input type="text" class="queryStyle" id="query2" placeholder="Message Vi..."></input>
-    <button id="AskQButton2" class="askQButton" onclick="ask2()"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
+    <button class="askbutton" id="AskQButton2" class="askQButton" onclick="ask2()"><img src="../ico/send_message.png" style="height: 30px; width: 30px; vertical-align: middle;"/></button>
     <img id="hourglass2" src="../ico/zhonyas_old.webp" width="30" height="30" style="display: none; vertical-align:middle">
 </div>
 
