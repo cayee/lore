@@ -115,6 +115,7 @@ def lambda_handler(event, _):
 
         # first - use just a prompt
         bedrockStartTime = time.time() - startTime
+        time.sleep(3)
         print(f"Before bedrock call: {bedrockStartTime}")
         generated_text = call_bedrock(bedrock, prompt)
         bedrockEndTime = time.time() - startTime
