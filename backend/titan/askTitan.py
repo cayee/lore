@@ -2,6 +2,7 @@ import json
 import time
 
 from ddbSession import ChatSession
+from ddbSession import ChatSessionLocation
 from askBedrock import connectToBedrock, getDocs, call_bedrock, modelId, textGenerationConfig
 
 is_cold_start = True
@@ -39,7 +40,7 @@ def lambda_handler(event, _):
 
     if is_cold_start:
         bedrock, vectorstores = connectToBedrock(["/opt/index_faiss"])
-        session = ChatSession()
+        session = ChatSessionLocation()
         is_cold_start = False
 
     print(f"Before session init: {time.time() - startTime}")
@@ -67,10 +68,26 @@ def lambda_handler(event, _):
         
     previousUserMessages = msgHistory["questions"] + [query]
     previousBotResponses = msgHistory["answers"] + [""]
+    if msgHistory["location"] != None:
+        topicList = msgHistory["location"].split(", ")
+        convSubject = " or ".join(topicList)
+    else:
+        convSubject = ""
+
     if 'promptSuffix' not in body or body['promptSuffix'] == "":
         body['promptSuffix'] = f""", "dialogue":\""""
         for q, a in zip(previousUserMessages[-3:], previousBotResponses[-3:]):
             body['promptSuffix'] += " Human: " + q + " Bot: " + a
+
+    if convSubject != "":
+        generated_control_ans = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Does the Human's last question refer to """ + convSubject + "?")
+        if generated_control_ans[-1] == '.':
+            generated_control_ans = generated_control_ans[:-1]
+        if generated_control_ans not in topicList or "no" in generated_control_ans.lower():
+            body['contextQuestions'] = query
+            convSubject = ""
+    if convSubject == "":
+        msgHistory["location"] = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Which characters, regions or events does the question '""" + query + """' refer to? List all the names.""")
 
     if 'contextQuestions' not in body or body['contextQuestions'] == "":
         contextQuestions = previousUserMessages if len(previousUserMessages) <= 3 else previousUserMessages [-3:]
@@ -103,7 +120,7 @@ def lambda_handler(event, _):
         bedrockEndTime = time.time() - startTime
         print(f"After bedrock call: {bedrockEndTime}")
         print({"bedrockStartTime": bedrockStartTime, "bedrockEndTime": bedrockEndTime, "bedrockCallTime": bedrockEndTime - bedrockStartTime, "promptLength": len(prompt), "prompt": prompt})
-        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt})
+        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "topicList": topicList, "control_ans": generated_control_ans, "location": msgHistory["location"]})
 
     resp_json = {"answers": answers}
     if log_questions:
@@ -114,7 +131,7 @@ def lambda_handler(event, _):
     session.reset(False)
     print(f"expr: {session.update_expression}")
     if "Sorry - this model" not in generated_text:
-        session.put(query, answers)
+        session.put(query, answers, msgHistory["location"], "")
     print(f"After session put: {time.time() - startTime}")
     return {
         'statusCode': 200,
