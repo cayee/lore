@@ -68,6 +68,7 @@ def lambda_handler(event, _):
         
     previousUserMessages = msgHistory["questions"] + [query]
     previousBotResponses = msgHistory["answers"] + [""]
+    qNumber = int(msgHistory["summary"]) if msgHistory["summary"] != None else 0
     if msgHistory["location"] != None:
         topicList = msgHistory["location"].split(", ")
         convSubject = " or ".join(topicList)
@@ -84,15 +85,16 @@ def lambda_handler(event, _):
     if convSubject != "":
         generated_control_ans = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Does the Human's last question refer to """ + convSubject + """? Answer in this JSON format: {["answer": BOOLEAN_A, "description": STRING_B]}. Substitute BOOLEAN_A with a True or False. Substitute STRING_B with a reason for the answer.\n""")
         print(generated_control_ans)
-        if "no" in generated_control_ans.lower():
-            body['contextQuestions'] = query
+        qNumber += 1
+        if "False" in generated_control_ans.lower():
+            qNumber = 1
             convSubject = ""
     print(generated_control_ans)
     if convSubject == "":
         msgHistory["location"] = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Which characters, regions or events does the question '""" + query + """' refer to? List all the names. Provide answer in a JSON format as follows: {['names': NAMES_A]}. Substitute NAMES_A with a list of names found.\n""")
 
     if 'contextQuestions' not in body or body['contextQuestions'] == "":
-        contextQuestions = previousUserMessages if len(previousUserMessages) <= 3 else previousUserMessages [-3:]
+        contextQuestions = previousUserMessages[-qNumber:] if qNumber <= 3 else previousUserMessages [-3:]
     else:
         contextQuestions = body['contextQuestions'].split('_')
 
@@ -123,7 +125,7 @@ def lambda_handler(event, _):
         bedrockEndTime = time.time() - startTime
         print(f"After bedrock call: {bedrockEndTime}")
         print({"bedrockStartTime": bedrockStartTime, "bedrockEndTime": bedrockEndTime, "bedrockCallTime": bedrockEndTime - bedrockStartTime, "promptLength": len(prompt), "prompt": prompt})
-        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "topicList": topicList, "control_ans": generated_control_ans, "location": msgHistory["location"]})
+        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "topicList": topicList, "control_ans": generated_control_ans, "location": msgHistory["location"], "qNumber": qNumber})
 
     resp_json = {"answers": answers}
     if log_questions:
@@ -134,7 +136,7 @@ def lambda_handler(event, _):
     session.reset(False)
     print(f"expr: {session.update_expression}")
     if "Sorry - this model" not in generated_text:
-        session.put(query, answers, msgHistory["location"], "")
+        session.put(query, answers, msgHistory["location"], qNumber)
     print(f"After session put: {time.time() - startTime}")
     return {
         'statusCode': 200,
