@@ -80,6 +80,7 @@ def lambda_handler(event, _):
         for q, a in zip(previousUserMessages[-3:], previousBotResponses[-3:]):
             body['promptSuffix'] += " Human: " + q + " Bot: " + a
 
+    generated_control_ans = ""
     if convSubject != "":
         generated_control_ans = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Does the Human's last question refer to """ + convSubject + "?")
         if generated_control_ans[-1] == '.':
@@ -122,7 +123,7 @@ def lambda_handler(event, _):
         bedrockEndTime = time.time() - startTime
         print(f"After bedrock call: {bedrockEndTime}")
         print({"bedrockStartTime": bedrockStartTime, "bedrockEndTime": bedrockEndTime, "bedrockCallTime": bedrockEndTime - bedrockStartTime, "promptLength": len(prompt), "prompt": prompt})
-        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "control_ans": generated_control_ans, "location": msgHistory["location"]})
+        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "topicList": topicList, "control_ans": generated_control_ans, "location": msgHistory["location"]})
 
     resp_json = {"answers": answers}
     if log_questions:
