@@ -11,10 +11,10 @@ KEY = os.getenv('TableKey')
 TABLE = os.getenv('Table')
 TTL_FIELD = os.getenv('TTL')
 TTL_TIME = int(os.getenv('TTLtime'))
-ANSWERS_FIELD = os.getenv('Answers')
-QUESTIONS_FIELD = os.getenv('Questions')
-LOCATION_FIELD = os.getenv('Location')
-SUMMARY_FIELD = os.getenv('Summary')
+ANSWERS_FIELD = os.getenv('Answers') if os.getenv('Answers') != None else "Answers"
+QUESTIONS_FIELD = os.getenv('Questions') if os.getenv('Questions') != None else "Questions"
+LOCATION_FIELD = os.getenv('Location') if os.getenv('Location') != None else "StoryLocation"
+SUMMARY_FIELD = os.getenv('Summary') if os.getenv('Summary') != None else "Summary"
 CHAT_FIELD = os.getenv('Chat')
 
 COOKIE_NAME = os.getenv('Cookie')
