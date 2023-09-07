@@ -68,7 +68,7 @@ def lambda_handler(event, _):
         
     previousUserMessages = msgHistory["questions"] + [query]
     previousBotResponses = msgHistory["answers"] + [""]
-    qNumber = int(msgHistory["summary"]) if msgHistory["summary"] != None else 0
+    qNumber = int(msgHistory["summary"]) if msgHistory["summary"] != None else 1
     if msgHistory["location"] != None:
         topicList = msgHistory["location"].split(", ")
         convSubject = " or ".join(topicList)
@@ -91,7 +91,7 @@ def lambda_handler(event, _):
             convSubject = ""
     print(generated_control_ans)
     if convSubject == "":
-        msgHistory["location"] = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Which characters, regions or events does the question '""" + query + """' refer to? List all the names. Provide answer in a JSON format as follows: {['names': NAMES_A]}. Substitute NAMES_A with a list of names found.\n""")
+        msgHistory["location"] = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Which characters, regions or events does the question '""" + query + """' refer to? List all the names. Provide answer as follows: {['names': NAMES_A]}. Substitute NAMES_A with a list of names found. This is a JSON format.\n""")
 
     if 'contextQuestions' not in body or body['contextQuestions'] == "":
         contextQuestions = previousUserMessages[-qNumber:] if qNumber <= 3 else previousUserMessages [-3:]
