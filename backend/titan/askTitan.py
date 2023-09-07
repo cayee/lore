@@ -88,6 +88,7 @@ def lambda_handler(event, _):
         if generated_control_ans not in topicList or "no" in generated_control_ans.lower():
             body['contextQuestions'] = query
             convSubject = ""
+    print(generated_control_ans)
     if convSubject == "":
         msgHistory["location"] = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Which characters, regions or events does the question '""" + query + """' refer to? List all the names.""")
 
