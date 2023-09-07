@@ -82,16 +82,14 @@ def lambda_handler(event, _):
 
     generated_control_ans = ""
     if convSubject != "":
-        generated_control_ans = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Does the Human's last question refer to """ + convSubject + "?\n")
+        generated_control_ans = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Does the Human's last question refer to """ + convSubject + """? Answer in this JSON format: {["answer": BOOLEAN_A, "description": STRING_B]}. Substitute BOOLEAN_A with a True or False. Substitute STRING_B with a reason for the answer.\n""")
         print(generated_control_ans)
-        if generated_control_ans[-1] == '.':
-            generated_control_ans = generated_control_ans[:-1]
-        if (generated_control_ans not in topicList or "no" in generated_control_ans.lower()) and "yes" not in generated_control_ans.lower():
+        if "no" in generated_control_ans.lower():
             body['contextQuestions'] = query
             convSubject = ""
     print(generated_control_ans)
     if convSubject == "":
-        msgHistory["location"] = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Which characters, regions or events does the question '""" + query + """' refer to? List all the names. Provide answer in a JSON format as follows: {['names': names]}.\n""")
+        msgHistory["location"] = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Which characters, regions or events does the question '""" + query + """' refer to? List all the names. Provide answer in a JSON format as follows: {['names': NAMES_A]}. Substitute NAMES_A with a list of names found.\n""")
 
     if 'contextQuestions' not in body or body['contextQuestions'] == "":
         contextQuestions = previousUserMessages if len(previousUserMessages) <= 3 else previousUserMessages [-3:]
