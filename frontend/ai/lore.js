@@ -1,3 +1,4 @@
+const expEnd   = document.querySelector("#expEndpoint");
 const logQs   = document.querySelector("#LogQuestions");
 const sendAll   = document.querySelector("#SendAll");
 
@@ -27,6 +28,7 @@ function insertMsg(node, msg, chat, user=false) {
 }
 
 function postAsk(api, data, callback) {
+    if (expEnd.checked) api += "-exp";
     let request = new XMLHttpRequest();
     request.open('POST', api, true);
     request.setRequestHeader('Content-type', 'application/json');
