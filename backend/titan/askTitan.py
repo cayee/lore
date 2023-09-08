@@ -60,11 +60,11 @@ def lambda_handler(event, _):
     if 'promptPrefix' not in body or body['promptPrefix'] == "":
         if 'loreType' in body:
             if body["loreType"] == "Default":
-                body['promptPrefix'] = """You are an assistant helping Human understand the Runeterra world. Complete the following dialogue using the context provided. If the answer is not related to the context or the Runeterra world, say that you cannot answer the question. Unless specified, use around 3 sentences to answer the question. {["context":"""
+                body['promptPrefix'] = """You are an assistant helping Human understand the Runeterra world. Complete the following dialogue using the context provided. If the answer is not related to the context or the Runeterra world, say that you cannot answer the question. Stick to the facts provided in context. Unless specified, use around 3 sentences to answer the question. {["context":"""
             elif body["loreType"] == "First":
-                body['promptPrefix'] = """You are a mysterious Bot that answers Human's questions about the Runeterra world. You usually speak in a weird, sometimes confusing manner but you still stick to the facts. Complete the following dialogue using the context provided. If the answer is not related to the context or the Runeterra world, say that you cannot answer the question. Unless specified, use around 3 sentences to answer the question. {["context":"""
+                body['promptPrefix'] = """You are a mysterious Bot that answers Human's questions about the Runeterra world. You usually speak in a weird, sometimes confusing manner but you still stick to the facts. Complete the following dialogue using the context provided. Stick to the facts provided in context. If the answer is not related to the context or the Runeterra world, say that you cannot answer the question. Unless specified, use around 3 sentences to answer the question. {["context":"""
             else:
-                body['promptPrefix'] = """You are a strict Bot that answers Human's questions about the Runeterra world. You do not use many words and are not very talkative. Complete the following dialogue using the context provided. If the answer is not related to the context or the Runeterra world, say that you cannot answer the question. {["context":"""
+                body['promptPrefix'] = """You are a strict Bot that answers Human's questions about the Runeterra world. You do not use many words and are not very talkative. Complete the following dialogue using the context provided. Stick to the facts provided in context. If the answer is not related to the context or the Runeterra world, say that you cannot answer the question. {["context":"""
         
     previousUserMessages = msgHistory["questions"] + [query]
     previousBotResponses = msgHistory["answers"] + [""]
@@ -83,7 +83,7 @@ def lambda_handler(event, _):
 
     generated_control_ans = ""
     if convSubject != "":
-        generated_control_ans = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Does the Human's last question refer to """ + convSubject + """? Answer in this JSON format: {["answer": BOOLEAN_A, "description": STRING_B]}. Substitute BOOLEAN_A with a True or False. Substitute STRING_B with a reason for the answer.\n""")
+        generated_control_ans = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Does the Human's last question refer to """ + convSubject + """? Answer in this JSON format: {["answer": BOOLEAN_A]}. Substitute BOOLEAN_A with a True or False.\nBOOLEAN_A = """)
         print(generated_control_ans)
         qNumber += 1
         if "false" in generated_control_ans.lower():
@@ -91,7 +91,7 @@ def lambda_handler(event, _):
             convSubject = ""
     print(generated_control_ans)
     if convSubject == "":
-        msgHistory["location"] = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Which characters, regions or events does the question '""" + query + """' refer to? List all the names. Provide answer as follows: {['names': NAMES_A]}. Substitute NAMES_A with a list of names found. This is a JSON format.\n""")
+        msgHistory["location"] = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Which characters, regions or events does the question '""" + query + """' refer to? List all the names. Provide answer as follows: {['names': NAMES_A]}. Substitute NAMES_A with a list of names found. This is a JSON format.\nNAMES_A = """)
 
     if 'contextQuestions' not in body or body['contextQuestions'] == "":
         contextQuestions = previousUserMessages[-qNumber:] if qNumber <= 3 else previousUserMessages [-3:]
