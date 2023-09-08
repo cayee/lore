@@ -54,3 +54,7 @@ Security:
  - prevent JSON prompt injection
  - prevent uer from injecting Bot: Vi: prefixes
  - prevent user from interfering with the story by manipulating the facts
+
+New models:
+- Embeddings v2.0 -  "amazon.titan-embed-g1-text-02" (Input vector = 8192, Output vector = 1536)
+- Titan XL - "amazon.titan-tg1-xlarge", "maxTokenCount": 8192

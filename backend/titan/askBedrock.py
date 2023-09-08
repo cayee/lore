@@ -14,7 +14,7 @@ textGenerationConfig = {
 }
 
 
-def call_bedrock(bedrock_client, prompt):
+def call_bedrock(bedrock_client, prompt, model = modelId):
     prompt_config = {
         "inputText": prompt,
         "textGenerationConfig": textGenerationConfig

@@ -39,8 +39,11 @@ function ask(suff) {
     const question = document.querySelector("#query"+suff).value;
     if (question.length < 1) return;
 
+    const loreMap = {'': 0, '-2': 1, '-3': 2}
     const chats = sendAll.checked ? ['', '-2', '-3']: [suff];
-    const loreTypes = ["Default", "First", "Second"];
+    let loreTypes = ["Default", "First", "Second"];
+    if (!sendAll.checked)
+        loreTypes = [loreMap[suff]];
 
     for (suffId in chats) {
         suff = chats[suffId];
@@ -121,13 +124,13 @@ function askViAgain() {
     postAsk("AskLast", {"sessId": "Vi"}, handleViResponse)
 }
 
-function actOnEnter(but) {
-    document.getElementById("query").addEventListener("keydown", function(e) {
+function actOnEnter(cont, but) {
+    document.getElementById(cont).addEventListener("keydown", function(e) {
         if (e.code === "Enter") document.getElementById(but).click()
     }, false);
 }
 
-actOnEnter("AskQButton")
-actOnEnter("AskQButton2")
-actOnEnter("AskQButton-2")
-actOnEnter("AskQButton-3")
+actOnEnter("query", "AskQButton")
+actOnEnter("query2", "AskQButton2")
+actOnEnter("query-2", "AskQButton-2")
+actOnEnter("query-3", "AskQButton-3")
