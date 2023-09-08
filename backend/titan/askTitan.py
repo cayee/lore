@@ -70,7 +70,7 @@ def lambda_handler(event, _):
     previousUserMessages = msgHistory["questions"] + [query]
     previousBotResponses = msgHistory["answers"] + [""]
 
-    qNumber = int(msgHistory["summary"]) if msgHistory["summary"] != None else 1
+    qNumber = int(msgHistory["summary"]) if msgHistory["summary"] != None else 0
     if msgHistory["location"] != None:
         topicList = msgHistory["location"].split(", ")
         convSubject = " or ".join(topicList)
@@ -96,7 +96,6 @@ def lambda_handler(event, _):
             new_location = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Which characters, regions or events does the question '""" + query + """' refer to? List all the names. Provide answer as follows: {['names': NAMES_A]}. Substitute NAMES_A with a list of names found. This is a JSON format.\nNAMES_A = """)
             if new_location != msgHistory["location"]: # topic actually changed
                 qNumber = 1
-            else:
                 msgHistory["location"] = new_location
     else:
         qNumber = qNumber+1 if qNumber < 3 else 3
@@ -142,7 +141,7 @@ def lambda_handler(event, _):
             for doc in docs2:
                 doc_sources_string2.append(doc.metadata)
                 context2 += doc.page_content + " "
-            prompt2 = """Complete the following dialogue using context provided. Answer with a 'true' or 'false'. The dialogue is provided in a JSON format: {["context": \"""" +  context2 + """\", "dialogue": Human: '""" + generated_text + """' Is this statement correct? Bot:"""
+            prompt2 = """Complete the following dialogue using context provided. The dialogue is provided in a JSON format: {["context": \"""" +  context2 + """\", "dialogue": Human: '""" + generated_text + """' Is this statement correct? Answer with a 'true' or 'false'. Bot:"""
             time.sleep(5)
             bedrockStartTime2 = time.time() - startTime
             print(f"Before bedrock call 2: {bedrockStartTime2}")
