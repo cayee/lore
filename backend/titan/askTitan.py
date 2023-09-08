@@ -84,6 +84,7 @@ def lambda_handler(event, _):
     generated_control_ans = ""
     if convSubject != "":
         generated_control_ans = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Does the Human's last question refer to """ + convSubject + """? Answer in this JSON format: {["answer": BOOLEAN_A]}. Substitute BOOLEAN_A with a True or False.\nBOOLEAN_A = """)
+        time.sleep(3)
         print(generated_control_ans)
         qNumber += 1
         if "false" in generated_control_ans.lower():
