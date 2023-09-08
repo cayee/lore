@@ -75,6 +75,7 @@ def lambda_handler(event, _):
         topicList = msgHistory["location"].split(", ")
         convSubject = " or ".join(topicList)
     else:
+        msgHistory["location"] = ""
         topicList = ""
         convSubject = ""
 
