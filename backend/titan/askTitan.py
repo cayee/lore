@@ -58,16 +58,18 @@ def lambda_handler(event, _):
             body['contextReturnNumber'] = 4
 
     if 'promptPrefix' not in body or body['promptPrefix'] == "":
-        if 'loreType' in body:
-            if body["loreType"] == "Default":
-                body['promptPrefix'] = """You are an assistant helping Human understand the Runeterra world. Complete the following dialogue using the context provided. If the answer is not related to the context or the Runeterra world, say that you cannot answer the question. Stick to the facts provided in context. Unless specified, use around 3 sentences to answer the question. {["context":"""
-            elif body["loreType"] == "First":
-                body['promptPrefix'] = """You are a mysterious Bot that answers Human's questions about the Runeterra world. You usually speak in a weird, sometimes confusing manner but you still stick to the facts. Complete the following dialogue using the context provided. Stick to the facts provided in context. If the answer is not related to the context or the Runeterra world, say that you cannot answer the question. Unless specified, use around 3 sentences to answer the question. {["context":"""
-            else:
-                body['promptPrefix'] = """You are a strict Bot that answers Human's questions about the Runeterra world. You do not use many words and are not very talkative. Complete the following dialogue using the context provided. Stick to the facts provided in context. If the answer is not related to the context or the Runeterra world, say that you cannot answer the question. {["context":"""
+        body['promptPrefix'] = """You are a mysterious Bot that answers Human's questions about the Runeterra world. You usually speak in a weird, sometimes confusing manner but you still stick to the facts. Complete the following dialogue using the context provided. Stick to the facts provided in context. If the answer is not related to the context or the Runeterra world, say that you cannot answer the question. Unless specified, use around 3 sentences to answer the question. {["context":"""
+    
+    difficulty = 0
+    if 'loreType' in body:
+        if body["loreType"] == "First":
+            difficulty = 1
+        elif body["loreType"] == "Second":
+            difficulty = 2
         
     previousUserMessages = msgHistory["questions"] + [query]
     previousBotResponses = msgHistory["answers"] + [""]
+
     qNumber = int(msgHistory["summary"]) if msgHistory["summary"] != None else 1
     if msgHistory["location"] != None:
         topicList = msgHistory["location"].split(", ")
@@ -82,17 +84,21 @@ def lambda_handler(event, _):
             body['promptSuffix'] += " Human: " + q + " Bot: " + a
 
     generated_control_ans = ""
-    if convSubject != "":
-        generated_control_ans = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Does the Human's last question refer to """ + convSubject + """? Answer in this JSON format: {["answer": BOOLEAN_A]}. Substitute BOOLEAN_A with a True or False.\nBOOLEAN_A = """)
-        time.sleep(3)
-        print(generated_control_ans)
-        qNumber += 1
-        if "false" in generated_control_ans.lower():
-            qNumber = 1
-            convSubject = ""
-    print(generated_control_ans)
-    if convSubject == "":
-        msgHistory["location"] = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Which characters, regions or events does the question '""" + query + """' refer to? List all the names. Provide answer as follows: {['names': NAMES_A]}. Substitute NAMES_A with a list of names found. This is a JSON format.\nNAMES_A = """)
+    if difficulty > 0:             # more advanced prompting - context cutoff
+        if convSubject != "":
+            generated_control_ans = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Does the Human's last question refer to """ + convSubject + """? Answer in this JSON format: {["answer": BOOLEAN_A]}. Substitute BOOLEAN_A with a True or False.\nBOOLEAN_A = """)
+            time.sleep(3)
+            qNumber += 1
+            if "false" in generated_control_ans.lower():
+                convSubject = ""
+        if convSubject == "":
+            new_location = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Which characters, regions or events does the question '""" + query + """' refer to? List all the names. Provide answer as follows: {['names': NAMES_A]}. Substitute NAMES_A with a list of names found. This is a JSON format.\nNAMES_A = """)
+            if new_location != msgHistory["location"]: # topic actually changed
+                qNumber = 1
+            else:
+                msgHistory["location"] = new_location
+    else:
+        qNumber = qNumber+1 if qNumber < 3 else 3
 
     if 'contextQuestions' not in body or body['contextQuestions'] == "":
         contextQuestions = previousUserMessages[-qNumber:] if qNumber <= 3 else previousUserMessages [-3:]
@@ -111,7 +117,7 @@ def lambda_handler(event, _):
             print(f"After getDocs: {time.time() - startTime}")
             for doc in docs:
                 doc_sources_string.append(doc.metadata)
-                context += doc.page_content
+                context += doc.page_content + " "
 
         if 'context' in body and body['context'] != "":
             context = body["context"]
@@ -126,7 +132,33 @@ def lambda_handler(event, _):
         bedrockEndTime = time.time() - startTime
         print(f"After bedrock call: {bedrockEndTime}")
         print({"bedrockStartTime": bedrockStartTime, "bedrockEndTime": bedrockEndTime, "bedrockCallTime": bedrockEndTime - bedrockStartTime, "promptLength": len(prompt), "prompt": prompt})
-        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "topicList": topicList, "control_ans": generated_control_ans, "location": msgHistory["location"], "qNumber": str(qNumber)})
+
+        generated_fact_check = ""
+        if difficulty > 1:         # even more advanced prompting - fact checking
+            context2 = ""
+            doc_sources_string2 = []
+            docs2 = getDocs(generated_text, vectorstore)
+            for doc in docs2:
+                doc_sources_string2.append(doc.metadata)
+                context2 += doc.page_content + " "
+            prompt2 = """Complete the following dialogue using context provided. Answer with a 'true' or 'false'. The dialogue is provided in a JSON format: {["context": \"""" +  context2 + """\", "dialogue": Human: '""" + generated_text + """' Is this statement correct? Bot:"""
+            time.sleep(5)
+            bedrockStartTime2 = time.time() - startTime
+            print(f"Before bedrock call 2: {bedrockStartTime2}")
+            generated_fact_check = call_bedrock(bedrock, prompt2)
+            bedrockEndTime2 = time.time() - startTime
+            print(f"After bedrock call 2: {bedrockEndTime2}")
+            if "false" in generated_fact_check.lower():
+                context += "The following statement is false: " + generated_text + " "
+                prompt = f"""{body['promptPrefix']} {context} {body['promptSuffix']}"""
+                bedrockStartTime3 = time.time() - startTime
+                time.sleep(5)
+                print(f"Before bedrock call: {bedrockStartTime3}")
+                generated_text = call_bedrock(bedrock, prompt)
+                bedrockEndTime3 = time.time() - startTime
+                print(f"After bedrock call: {bedrockEndTime3}")
+
+        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "topicList": topicList, "control_ans": generated_control_ans, "location": msgHistory["location"], "qNumber": str(qNumber), "factCheck": generated_fact_check})
 
     resp_json = {"answers": answers}
     if log_questions:
