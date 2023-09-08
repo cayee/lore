@@ -45,7 +45,7 @@ function ask(suff) {
     const chats = sendAll.checked ? ['', '-2', '-3']: [suff];
     let loreTypes = ["Default", "First", "Second"];
     if (!sendAll.checked)
-        loreTypes = [loreMap[suff]];
+        loreTypes = [loreTypes[loreMap[suff]]];
 
     for (suffId in chats) {
         suff = chats[suffId];
