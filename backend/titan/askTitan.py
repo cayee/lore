@@ -92,9 +92,11 @@ def lambda_handler(event, _):
                 time.sleep(3)
                 qNumber += 1
                 if "false" in generated_control_ans.lower():
+                    qNumber -= 1
                     convSubject = ""
         if convSubject == "" or difficulty == 2:
             new_location = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Which characters, regions or events does the question '""" + query + """' refer to? List all the names. Provide answer as follows: {['names': NAMES_A]}. Substitute NAMES_A with a list of names found. This is a JSON format.\nNAMES_A = """)
+            qNumber += 1
             if new_location != msgHistory["location"]: # topic actually changed
                 qNumber = 1
                 msgHistory["location"] = new_location
