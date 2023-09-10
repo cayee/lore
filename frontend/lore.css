@@ -3,6 +3,14 @@
     src: url('./fonts/BeaufortForLoL-TTF/BeaufortforLOL-Bold.ttf') format("Truetype");
 }
 
+.header {
+    text-align: center;
+}
+
+* {
+    box-sizing: border-box;
+}
+
 .message__outer {
     display: flex;
 }
@@ -24,9 +32,15 @@
 }
 
 body {
+    margin: 0;
+    padding: 0;
     background-color: rgba(1,10,19);
     font-family: "Beaufort for LOL", Arial, sans-serif;
     color: #f0e6d2;
+    background-image: url("./img/Piltover.jpg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-color: #fff;
 }
 
 #MainH {
@@ -43,13 +57,13 @@ body {
     height: 38px; width: 38px; vertical-align: middle; background-color: #221E1F; border-color: #221E1F
 }
 
-#query {
+/* #query {
     height: 32px; width: 242px; vertical-align: middle; background-color: #221E1F; border-color: #221E1F; color: #f0e6d2
-}
+} */
 
-.queryStyle {
+/* .queryStyle {
     height: 32px; width: 242px; vertical-align: middle; background-color: #221E1F; border-color: #221E1F; color: #f0e6d2
-}
+} */
 
 input[type=text]
 {
@@ -59,4 +73,135 @@ input[type=text]
 .subTitle {
     font-family: "Beaufort for LOL";
     color: #f0e6d2;
+}
+
+.container {
+    margin: 0 auto;
+    max-width: 1024px;
+    background-color: rgba(1,10,19, 0.8);
+    padding: 16px;
+    border-radius: 20px;
+    margin-bottom: 32px;
+}
+
+.chatDiv__container {
+    padding: 8px;
+    margin-right: 8px;
+}
+
+.chatDiv__container:last-child {
+    margin-right: 0;
+}
+
+.chatDiv {
+    border: 1px solid #c8aa6e;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    overflow-y: hidden;
+    
+}
+
+.chatDiv:hover {
+    overflow-y: scroll;
+}
+
+header {
+    width: 100%;
+    background-color: lightblue;
+    background-color: #221E1F;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+header div {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+header h1 {
+    display: inline-block;
+    font-family: "Beaufort for LOL";
+    color: #f0e6d2;
+    margin: 8px 0;
+    padding: 0;
+}
+
+input[type=text] {
+    padding: 8px;
+    margin: 0;
+    border: none;
+    background-color: transparent;
+    width: 262px;
+}
+
+.message__container {
+    position: relative;
+}
+
+.message__container input[type=text] {
+    position: relative;
+    padding: 8px;
+    margin: 0;
+    border: none;
+    
+    background-color: #fcfaf5;
+    width: 300px;
+    border-radius: 20px;
+}
+
+.message__container button {
+    position: absolute;
+    right: 8px;
+    top: -2px;
+    border: none;
+    margin: 0;
+    padding: 0;
+    width: auto;
+    overflow: visible;
+
+    background: transparent;
+
+    /* inherit font & color from ancestor */
+    color: inherit;
+    font: inherit;
+
+    /* Normalize `line-height`. Cannot be changed from `normal` in Firefox 4+. */
+    line-height: normal;
+
+    /* Corrects font smoothing for webkit */
+    -webkit-font-smoothing: inherit;
+    -moz-osx-font-smoothing: inherit;
+
+    /* Corrects inability to style clickable `input` types in iOS */
+    -webkit-appearance: none;
+
+    cursor: pointer;
+    width: 38px;
+    height: 38px;
+    /* background-color: #c8aa6e; */
+    border-radius: 50%;
+}
+
+.message__container button:hover {
+    background-color: #c8aa6e;
+}
+
+.message__container button img {
+    width: 20px;
+    height: 20px;
+    margin-left: 3px;
+}
+
+.vi-send-button {
+    left: 262px;
+}
+
+.vi-retry {
+    left: 310px;
+    width: 60px !important;
+    border-radius: 20px !important;
+}
+
+.story-background {
+    border-radius: 20px;
 }
