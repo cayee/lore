@@ -77,7 +77,7 @@ def lambda_handler(event, _):
         topicList = msgHistory["location"].split(", ")
         convSubject = " or ".join(topicList)
     else:
-        msgHistory["location"] = ""
+        msgHistory["location"] = []
         topicList = ""
         convSubject = ""
 
@@ -98,7 +98,10 @@ def lambda_handler(event, _):
                     convSubject = ""
         if convSubject == "" or difficulty == 2:
             new_location = call_bedrock(bedrock, """This is the conversation between Human and Bot in JSON format: {["conversation": \"""" + body["promptSuffix"][14:] + """\"]}. Which characters, regions or events does the question '""" + query + """' refer to? List all the names. Provide answer as follows: {['names': NAMES_A]}. Substitute NAMES_A with a list of names found. This is a JSON format.\nNAMES_A = """)
-            new_location = json.loads(new_location) if new_location != "" else list()
+            try:
+                new_location = json.loads(new_location)
+            except:
+                new_location = []
             qNumber += 1
             new_set = set(new_location)
             old_set = set(msgHistory["location"])
