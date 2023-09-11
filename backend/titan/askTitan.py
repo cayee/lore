@@ -172,7 +172,7 @@ def lambda_handler(event, _):
                 bedrockEndTime3 = time.time() - startTime
                 print(f"After bedrock call: {bedrockEndTime3}")
 
-        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "topicList": topicList, "control_ans": generated_control_ans, "location": msgHistory["location"], "qNumber": str(qNumber), "first_answer": first_ans, "factCheck": generated_fact_check})
+        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "topicList": topicList, "control_ans": generated_control_ans, "location": str(msgHistory["location"]), "qNumber": str(qNumber), "first_answer": first_ans, "factCheck": generated_fact_check})
 
     resp_json = {"answers": answers}
     if log_questions:
