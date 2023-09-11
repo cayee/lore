@@ -13,6 +13,7 @@ textGenerationConfig = {
     "topP": 0.2,
 }
 
+#"amazon.titan-tg1-xlarge", "maxTokenCount": 8192
 
 def call_bedrock(bedrock_client, prompt, model = modelId):
     prompt_config = {
@@ -48,8 +49,8 @@ def connectToBedrock(indexes):
                            endpoint_url="https://prod.us-west-2.frontend.bedrock.aws.dev",
                            # endpoint_url="https://bedrock.us-east-1.amazonaws.com",
                            )
-    embeddings = BedrockEmbeddings(client=bedrock)
-    vectorstores = [FAISS.load_local(index, embeddings) for index in indexes]
+    vectorstores = [FAISS.load_local(index["index"], BedrockEmbeddings(client=bedrock, model_id=index["model"]))
+                    for index in indexes]
     return bedrock, vectorstores
 
 

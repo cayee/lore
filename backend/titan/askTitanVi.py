@@ -42,7 +42,7 @@ def lambda_handler(event, _):
     global is_cold_start, bedrock, vectorstores, session
 
     if is_cold_start:
-        bedrock, vectorstores = connectToBedrock(["/opt/index_faiss"])
+        bedrock, vectorstores = connectToBedrock([{"index": "/opt/index_faiss", "model": "amazon.titan-e1t-medium"}])
         session = ChatSessionLocation()
         is_cold_start = False
 

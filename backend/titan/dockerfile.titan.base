@@ -7,3 +7,5 @@ RUN pip install --upgrade pip && pip install -r requirements.txt --target "${LAM
 
 COPY index_faiss /opt/index_faiss
 COPY index_faiss_3 /opt/index_faiss_3
+COPY index_faiss_5_embv2 /opt/index_faiss_5_embv2
+COPY index_faiss_10_embv2 /opt/index_faiss_10_embv2
