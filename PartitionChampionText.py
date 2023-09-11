@@ -35,7 +35,7 @@ def divideText(text, name=""):
     return parts
 
 def createParagraph(data):
-    text = f"{data['name']} is a League of Legends champion and their title is {data['title']}."
+    text = f"{data['name']} is an important character in Runeterra and their title is {data['title']}."
     
     if data["races"] != []:
         if len(data["races"]) == 1:
