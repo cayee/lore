@@ -98,6 +98,6 @@ for text in championInfo["extras"]:
 print(len(textParts), len(metadatas))
 finality = {"list": textParts, "meta": metadatas}
 
-with open("textParts.json", 'w') as f:
+with open(f"textParts-{SENTENCES}.json", 'w') as f:
     data = json.dumps(finality)
     f.write(data)

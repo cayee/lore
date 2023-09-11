@@ -15,7 +15,7 @@ bedrock = boto3.client(
     #endpoint_url="https://bedrock.us-east-1.amazonaws.com",
 )
 
-FILENAME = "textParts.json"
+FILENAME = "textParts-5.json"
 
 with open(FILENAME, 'r') as f:
     championInfo = json.load(f)
@@ -25,8 +25,8 @@ metadatas = championInfo["meta"]
 
 docs = [Document(page_content=text, metadata={'link': link}) for text, link in zip(texts, metadatas)]
 
-be = BedrockEmbeddings(client = bedrock)
+be = BedrockEmbeddings(client = bedrock, model_id = "amazon.titan-embed-g1-text-02")
 #be.embed_documents(texts)
 
 docsearch = FAISS.from_documents(docs, be)
-docsearch.save_local('index_faiss')
+docsearch.save_local('index_faiss_5_embv2')
