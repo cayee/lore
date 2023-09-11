@@ -139,6 +139,7 @@ def lambda_handler(event, _):
         print({"bedrockStartTime": bedrockStartTime, "bedrockEndTime": bedrockEndTime, "bedrockCallTime": bedrockEndTime - bedrockStartTime, "promptLength": len(prompt), "prompt": prompt})
 
         generated_fact_check = ""
+        first_ans = generated_text
         if difficulty > 1:         # even more advanced prompting - fact checking
             context2 = ""
             doc_sources_string2 = []
@@ -163,7 +164,7 @@ def lambda_handler(event, _):
                 bedrockEndTime3 = time.time() - startTime
                 print(f"After bedrock call: {bedrockEndTime3}")
 
-        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "topicList": topicList, "control_ans": generated_control_ans, "location": msgHistory["location"], "qNumber": str(qNumber), "factCheck": generated_fact_check})
+        answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "topicList": topicList, "control_ans": generated_control_ans, "location": msgHistory["location"], "qNumber": str(qNumber), "first_answer": first_ans, "factCheck": generated_fact_check})
 
     resp_json = {"answers": answers}
     if log_questions:
