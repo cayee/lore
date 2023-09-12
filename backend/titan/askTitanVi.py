@@ -167,6 +167,7 @@ def lambda_handler(event, _):
             for k, v in subquests3.items():
                 promptQuests += str(k+1) + ". " + v + '\n'
             promptQuests += "Answers:\n"
+        print("Quests prompt:", promptQuests)
         generated_quest_ans = call_bedrock(bedrock, promptQuests)
         print("Quest answers: " + generated_quest_ans)
         questAns = generated_quest_ans.split(' ')
