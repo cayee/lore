@@ -80,10 +80,11 @@ def lambda_handler(event, _):
 
         promptContext = """{"context": """
 
-        CONTEXT_SCENE_1 = "Rookie is a new enforcer trainee in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and investigate the scene since someone broke into the vault a few hours ago."
+        CONTEXT_SCENE_1 = "Rookie is a new enforcer trainee in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and investigate the scene since someone broke into the vault a few hours ago. She is going there alone."
         CONTEXT_SCENE_1_FULL = "Rookie is a new enforcer trainee in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and investigate the scene since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. Nobody knows if anything has been stolen, that's for the Vi to find out. Vi doesn't want to take Rookie to the Vaults with her. Only if Rookie proves they are strong enough Vi might change her mind. Vi doesn't know who is behind the break in and will doubt every theory regarding who might have done it."
-        CONTEXT_SCENE_2 = "Right now Rookie and Vi are at the Ecliptic Vaults. There is noone around but the main vault is in a bad shape and looks as it was damaged in an attempted break-in. Vi and Rookie cannot go inside no matter what since the building is very unstable. The thieves didn't manage to break through and didn't steal anything. There is a lot of junk lying around and among them there is a scrap of metal with a blue graffiti on it. Vi recognizes the graffiti to be Loxy's - one of the 'Rawring Sparks' gang member. Loxy is the mastermind behind the Rawring Sparks operations. The Rawring Sparks have been causing mischeif in Piltover more and more often recently. Vi doesn't want to share all the information at once. When Rookie finds out about Loxy, Vi should suggest going to the Lanes together with Rookie as it is the very heart of Zaun."
-        CONTEXT_SCENE_3 = "Rookie and Vi arrive to the Lanes in Zaun. At first, Vi suggest going to the local bar 'The Last Crop' to ask locals for some information regarding 'Rawring Sparks'. However, on the way to the bar a loud exploosion is heard and a flash of blue light errupts in an alley nearby. Vi and Rookie run towards it but when they reach the destination, unexpected guests await them. When Rookie and Vi meet the guests, Vi should only respond with 'TO BE CONTINUED...' and nothing else."
+        CONTEXT_SCENE_2_FULL = "Right now Rookie and Vi are at the Ecliptic Vaults. There is noone around but the main vault is in a bad shape and looks as if it was damaged in an attempted break-in. Vi and Rookie cannot go inside no matter what since the building is very unstable. The thieves didn't manage to break through and didn't steal anything. There is a lot of junk lying around and among them there is a scrap of metal with a blue graffiti on it. Vi recognizes the graffiti to be Loxy's - one of the 'Rawring Sparks' gang member. Loxy is the mastermind behind the Rawring Sparks operations. The Rawring Sparks have been causing mischeif in Piltover more and more often recently. Vi doesn't want to share all the information at once. When Rookie finds out about Loxy, Vi should suggest going to the Lanes together with Rookie as it is the very heart of Zaun."
+        CONTEXT_SCENE_2 = "Right now Rookie and Vi are at the Ecliptic Vaults. Rookie and Vi can't go inside the vaults as they were damaged in an attempted break-in and might collapse any minute."
+        CONTEXT_SCENE_3 = "Rookie and Vi arrive to the Lanes in Zaun. Vi suggest going to the local bar 'The Last Crop' to ask locals for some information regarding 'Rawring Sparks'."
 
         # depending on the location
         promptContext += summary + " "
@@ -145,8 +146,10 @@ def lambda_handler(event, _):
         # check subquests
         subquests1 = {0: 'Has Rookie asked about the vaults?', 1: 'Has Rookie asked why is Vi going to the vaults?', 2: 'Has Rookie asked about the perpetrators?', 3: 'Has Rookie asked about the break-in?', 4: 'Has Rookie asked about the investigation?', 5: 'Has Rookie asked Vi to come with her?'}
         subanswers1 = {0: 'Noone is sure about what happened at the scene.', 1: '', 2: 'Noone knows who the perpetrators may be and Vi will doubt every claim about who might have done it.', 3: 'Noone was injured in a break-in but the perpetrators might still be around.', 4: 'Vi is the first and only enforcer dispatched in this investigation.', 5: 'Vi won\'t take Rookie with her unless Rookie proves they are strong enough.'}
-        subquests2 = {}
-        subquests3 = {}
+        subquests2 = {0: 'Has Rookie asked about the vaults?', 1: 'Has Rookie asked about the break-in?', 2: 'Has Rookie asked if anything has been stolen?', 3: 'Has anyone suggested looking for clues?', 4: 'Has Rookie asked about the blue graffiti?', 5: 'Has Vi told Rookie about Loxy?', 6: 'Has Rookie asked about the perpetrators?', 7: 'Has Rookie asked who might have broken in?', 8: 'Has Vi told Rookie about Zaun gangsters?'}
+        subanswers2 = {0: '', 1: 'The thieves tried to break in but only managed to damage the building, they didn\'t steal anything.', 2: 'Nothing has been stolen from the Vaults.', 3: 'Vi and Rookie should look around for clues. There is a lot of junk lying around. Among them there is a piece of metal with blue graffiti on it.', 4: 'Although it is similiar to Jinx\'s style, Vi recognizes the graffiti to be Loxy\'s', 5: 'Loxy is a part of the Zaun gang known as Rawring Sparks and is the mastermind behind their operations.', 6: 'Vi suspects that the thieves might actually be the Zaun gangsters.', 7: 'Vi suspects that the thieves might actually be the Zaun gangsters.', 8: 'Rawring Sparks\' leader is Loxy. The Sparks have been causing a lot of mischief in Piltover lately.', 'Bonus1': 'Vi might suggest going to the Lanes to look for more information.'}
+        subquests3 = {0: 'Has Rookie asked about what to do there?', 1: '', 2: '', 3: '', 4: '', 5: ''}
+        subanswers3 = {0: '', 1: '', 2: '', 3: '', 4: '', 5: ''}
 
         promptQuests = """The following is a story involving Rookie and Vi with some context in a JSON format: {"context": \""""
         if location == LOCATION_1:
@@ -172,9 +175,18 @@ def lambda_handler(event, _):
         print("Quest answers: " + generated_quest_ans)
         questAns = generated_quest_ans.split(' ')
         promptQuestBonus = ""
+        completedQuests = set()
         for i in range(len(questAns)):
             if 'yes' in questAns[i].lower():
-                promptQuestBonus += subanswers1[i] + " "
+                completedQuests.add(i)
+                if location == LOCATION_1:
+                    promptQuestBonus += subanswers1[i] + " "
+                elif location == LOCATION_2:
+                    promptQuestBonus += subanswers2[i] + " "
+                    if set([4, 5, 6, 7]) & completedQuests:
+                        promptQuestBonus += subanswers2['Bonus1'] + " "
+                else:
+                    promptQuestBonus += subanswers3[i] + " "
         
         prompt += promptContext + promptQuestBonus + promptStory
         # beautify the response:
