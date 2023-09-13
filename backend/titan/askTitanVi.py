@@ -77,22 +77,22 @@ def lambda_handler(event, _):
 
         prompt = """You are playing a character named Vi. Here are some texts about Vi:
         {"texts": "Once a criminal from the mean streets of Zaun, Vi is a hotheaded, impulsive, and fearsome woman with only a very loose respect for authority figures. Growing up all but alone, Vi developed finely honed survival instincts as well as a wickedly abrasive sense of humor. Now working with the Wardens of Piltover to keep the peace, she wields mighty hextech gauntlets that can punch through walls and suspects with equal ease."}
-        Here is some context about the place where the scene takes place:
+        Here is some context about the place where the scene takes place as well as summary of past events:
         """ + context + """
         
         Complete the following short story as Vi:
         """
 
-        promptContext = """{"context": """
+        promptContext = """"context": \""""
 
         CONTEXT_SCENE_1 = "Rookie is a new enforcer trainee in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults alone and investigate the scene since someone broke into the vault a few hours ago."
         CONTEXT_SCENE_1_FULL = "Rookie is a new enforcer trainee in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and investigate the scene since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. Nobody knows if anything has been stolen, that's for the Vi to find out. Vi doesn't want to take Rookie to the Vaults with her. Only if Rookie proves they are strong enough Vi might change her mind. Vi doesn't know who is behind the break in and will doubt every theory regarding who might have done it."
         CONTEXT_SCENE_2_FULL = "Right now Rookie and Vi are at the Ecliptic Vaults. There is noone around but the main vault is in a bad shape and looks as if it was damaged in an attempted break-in. Vi and Rookie cannot go inside no matter what since the building is very unstable. The thieves didn't manage to break through and didn't steal anything. There is a lot of junk lying around and among them there is a scrap of metal with a blue graffiti on it. Vi recognizes the graffiti to be Loxy's - one of the 'Rawring Sparks' gang member. Loxy is the mastermind behind the Rawring Sparks operations. The Rawring Sparks have been causing mischeif in Piltover more and more often recently. Vi doesn't want to share all the information at once. When Rookie finds out about Loxy, Vi should suggest going to the Lanes together with Rookie as it is the very heart of Zaun."
-        CONTEXT_SCENE_2 = "Right now Rookie and Vi are at the Ecliptic Vaults. Rookie and Vi can't go inside the vaults as they were damaged in an attempted break-in and might collapse any minute."
+        CONTEXT_SCENE_2 = "Right now Rookie and Vi are at the Ecliptic Vaults. Rookie and Vi can't go inside the vaults as they were damaged in an attempted break-in and might collapse any minute. Vi and Rookie should look around for clues in order to solve the case."
         CONTEXT_SCENE_3 = "Rookie and Vi arrive to the Lanes in Zaun. Vi suggest going to the local bar 'The Last Crop' to ask locals for some information regarding 'Rawring Sparks'."
 
         # depending on the location
-        promptContext += summary + " "
+        promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
         if location == LOCATION_1:
             promptContext += CONTEXT_SCENE_1
         elif location == LOCATION_2:
@@ -100,7 +100,7 @@ def lambda_handler(event, _):
         else:
             promptContext += CONTEXT_SCENE_3
 
-        promptStory = ", \"story\": \""
+        promptStory = "\", \"story\": \""
 
         # use previous messages
         previousUserMessages = msgHistory["questions"] + [query]
@@ -120,9 +120,9 @@ def lambda_handler(event, _):
             if "yes" in region_response.lower():
                 location = LOCATION_2
                 call_number = debug_count_call(call_number, 5)
-                summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[2:]+'"}'}. Summarize the story.""")
-                promptContext = """{"context": """
-                promptContext += summary + " "
+                summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[3:]+'"}'}. Summarize the story.""")
+                promptContext = """\"context": """
+                promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
                 promptContext += CONTEXT_SCENE_2
                 doReset = True
 
@@ -134,9 +134,9 @@ def lambda_handler(event, _):
             if "yes" in region_response.lower():
                 location = LOCATION_3
                 call_number = debug_count_call(call_number, 5)
-                summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[2:]+'"}'}. Summarize the story.""")
-                promptContext = """{"context": """
-                promptContext += summary + " "
+                summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[3:]+'"}'}. Summarize the story.""")
+                promptContext = """\"context": """
+                promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
                 promptContext += CONTEXT_SCENE_3
                 doReset = True
                 
@@ -148,9 +148,9 @@ def lambda_handler(event, _):
             if "yes" in region_response.lower():
                 location = LOCATION_1
                 call_number = debug_count_call(call_number, 5)
-                summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[2:]+'"}'}. Summarize the story.""")
-                promptContext = """{"context": """
-                promptContext += summary + " "
+                summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[3:]+'"}'}. Summarize the story.""")
+                promptContext = """\"context": """
+                promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
                 promptContext += CONTEXT_SCENE_1
                 doReset = True
 
@@ -165,19 +165,19 @@ def lambda_handler(event, _):
         promptQuests = """The following is a story involving Rookie and Vi with some context in a JSON format: {"context": \""""
         if location == LOCATION_1:
             promptQuests += CONTEXT_SCENE_1
-            promptQuests += """, "story": \"""" + dialogue[:-5] + """\"}. There is a list of questions provided. Answer each question with a 'yes' or 'no', as an output provide a list. The list of questions:\nQuestions:\n"""
+            promptQuests += """\", "story": \"""" + dialogue[:-5] + """\"}. There is a list of questions provided. Answer each question with a 'yes' or 'no', as an output provide a list. The list of questions:\nQuestions:\n"""
             for k, v in subquests1.items():
                 promptQuests += str(k+1) + ". " + v + '\n'
             promptQuests += "Answers:\n"
         elif location == LOCATION_2:
             promptQuests += CONTEXT_SCENE_2
-            promptQuests += """, "story": \"""" + dialogue[:-5] + """\"}. There is a list of questions provided. Answer each question with a 'yes' or 'no', as an output provide a list. The list of questions:\nQuestions:\n"""
+            promptQuests += """\", "story": \"""" + dialogue[:-5] + """\"}. There is a list of questions provided. Answer each question with a 'yes' or 'no', as an output provide a list. The list of questions:\nQuestions:\n"""
             for k, v in subquests2.items():
                 promptQuests += str(k+1) + ". " + v + '\n'
             promptQuests += "Answers:\n"
         else:
             promptQuests += CONTEXT_SCENE_3
-            promptQuests += """, "story": \"""" + dialogue[:-5] + """\"}. There is a list of questions provided. Answer each question with a 'yes' or 'no', as an output provide a list. The list of questions:\nQuestions:\n"""
+            promptQuests += """\", "story": \"""" + dialogue[:-5] + """\"}. There is a list of questions provided. Answer each question with a 'yes' or 'no', as an output provide a list. The list of questions:\nQuestions:\n"""
             for k, v in subquests3.items():
                 promptQuests += str(k+1) + ". " + v + '\n'
             promptQuests += "Answers:\n"
