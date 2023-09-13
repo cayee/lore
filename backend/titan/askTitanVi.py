@@ -55,6 +55,7 @@ def lambda_handler(event, _):
     print(f"After session load: {time.time() - startTime}")
     answers = []
     for vectorstore in vectorstores:
+        call_number = 0
         # Find docs
         context = ""
         doc_sources_string = []
@@ -110,10 +111,14 @@ def lambda_handler(event, _):
         if location == LOCATION_1:
             controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"}'}. Are Vi and Rookie at the Ecliptic Vaults already? Answer 'Yes.' or 'No.'"""
             region_response = call_bedrock(bedrock, controlPrompt)
+            call_number += 1
+            print("call_number:", call_number)
             controlReturn = "1_" + controlPrompt + "_" + region_response
             if "yes" in region_response.lower():
                 location = LOCATION_2
                 summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[2:]+'"}'}. Summarize the story.""")
+                call_number += 1
+                print("call_number:", call_number)
                 promptContext = """{"context": """
                 promptContext += summary + " "
                 promptContext += CONTEXT_SCENE_2
@@ -122,10 +127,14 @@ def lambda_handler(event, _):
         elif location == LOCATION_2:
             controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"}'}. Are Vi and Rookie at the Lanes already? Answer 'Yes.' or 'No.'"""
             region_response = call_bedrock(bedrock, controlPrompt)
+            call_number += 1
+            print("call_number:", call_number)
             controlReturn = "2_" + controlPrompt + "_" + region_response
             if "yes" in region_response.lower():
                 location = LOCATION_3
                 summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[2:]+'"}'}. Summarize the story.""")
+                call_number += 1
+                print("call_number:", call_number)
                 promptContext = """{"context": """
                 promptContext += summary + " "
                 promptContext += CONTEXT_SCENE_3
@@ -134,10 +143,14 @@ def lambda_handler(event, _):
         else:
             controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"}'}. Are Vi and Rookie in Shurima already? Answer 'Yes.' or 'No.'"""
             region_response = call_bedrock(bedrock, controlPrompt)
+            call_number += 1
+            print("call_number:", call_number)
             controlReturn = "3_" + controlPrompt + "_" + region_response
             if "yes" in region_response.lower():
                 location = LOCATION_1
                 summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[2:]+'"}'}. Summarize the story.""")
+                call_number += 1
+                print("call_number:", call_number)
                 promptContext = """{"context": """
                 promptContext += summary + " "
                 promptContext += CONTEXT_SCENE_1
@@ -172,6 +185,8 @@ def lambda_handler(event, _):
             promptQuests += "Answers:\n"
         print("Quests prompt:", promptQuests)
         generated_quest_ans = call_bedrock(bedrock, promptQuests)
+        call_number += 1
+        print("call_number:", call_number)
         print("Quest answers: " + generated_quest_ans)
         questAns = generated_quest_ans.split('\n')
         promptQuestBonus = ""
@@ -194,6 +209,8 @@ def lambda_handler(event, _):
         print(f"Before bedrock call: {bedrockStartTime}")
         #prompt = "Rookie: " + query + " Vi: " + call_bedrock(bedrock, prompt)
         generated_text = call_bedrock(bedrock, prompt)
+        call_number += 1
+        print("call_number:", call_number)
         bedrockEndTime = time.time() - startTime
         print(f"After bedrock call: {bedrockEndTime}")
         print({"bedrockStartTime": bedrockStartTime, "bedrockEndTime": bedrockEndTime, "bedrockCallTime": bedrockEndTime - bedrockStartTime, "promptLength": len(prompt), "prompt": prompt})
@@ -212,6 +229,8 @@ def lambda_handler(event, _):
             else:
                 location = LOCATION_1
             summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{[' + promptStory[2:]+'"]}'}. Summarize the story.""")
+            call_number += 1
+            print("call_number:", call_number)
             doReset = True
 
         answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "location": location, "control": controlReturn, "full_answer": fullAnswer, "summary": summary, 'quests': generated_quest_ans})
