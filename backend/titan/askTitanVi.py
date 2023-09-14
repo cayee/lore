@@ -83,7 +83,7 @@ def lambda_handler(event, _):
         Complete the following short story as Vi:
         """
 
-        promptContext = """"context": \""""
+        promptContext = """{\"context": \""""
 
         CONTEXT_SCENE_1 = "Rookie is a new enforcer trainee in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults without Rookie and investigate the scene since someone broke into the vault an hour ago."
         CONTEXT_SCENE_1_FULL = "Rookie is a new enforcer trainee in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults and investigate the scene since someone broke into the vault a few hours ago. Noone was hurt at the scene but the perpetrators could still be in the area. Nobody knows if anything has been stolen, that's for the Vi to find out. Vi doesn't want to take Rookie to the Vaults with her. Only if Rookie proves they are strong enough Vi might change her mind. Vi doesn't know who is behind the break in and will doubt every theory regarding who might have done it."
@@ -92,7 +92,7 @@ def lambda_handler(event, _):
         CONTEXT_SCENE_3 = "Rookie and Vi arrive to the Lanes in Zaun. Vi suggest going to the local bar 'The Last Crop' to ask locals for some information regarding 'Rawring Sparks'."
 
         # depending on the location
-        promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
+        #promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
         if location == LOCATION_1:
             promptContext += CONTEXT_SCENE_1
         elif location == LOCATION_2:
@@ -124,8 +124,8 @@ def lambda_handler(event, _):
                 location = LOCATION_2
                 call_number = debug_count_call(call_number, 5)
                 summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[3:]+'"}'}. Summarize the story.""")
-                promptContext = """\"context": """
-                promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
+                promptContext = """{\"context": """
+                #promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
                 promptContext += CONTEXT_SCENE_2
                 doReset = True
 
@@ -138,8 +138,8 @@ def lambda_handler(event, _):
                 location = LOCATION_3
                 call_number = debug_count_call(call_number, 5)
                 summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[3:]+'"}'}. Summarize the story.""")
-                promptContext = """\"context": """
-                promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
+                promptContext = """{\"context": """
+                #promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
                 promptContext += CONTEXT_SCENE_3
                 doReset = True
                 
@@ -152,8 +152,8 @@ def lambda_handler(event, _):
                 location = LOCATION_1
                 call_number = debug_count_call(call_number, 5)
                 summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[3:]+'"}'}. Summarize the story.""")
-                promptContext = """\"context": """
-                promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
+                promptContext = """{\"context": """
+                #promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
                 promptContext += CONTEXT_SCENE_1
                 doReset = True
 
