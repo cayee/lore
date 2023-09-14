@@ -66,7 +66,8 @@ def lambda_handler(event, _):
         
         print(f"Before getDocs: {time.time() - startTime}")
         #docs = getDocs(query, vectorstore)
-        docs = getDocs(location, vectorstore)
+        #docs = getDocs(location, vectorstore)
+        docs = []
         for doc in docs:
             doc_sources_string.append(doc.metadata)
             context += doc.page_content
@@ -75,14 +76,9 @@ def lambda_handler(event, _):
         if 'context' in body and body['context'] != "":
             context = body["context"]
 
-        prompt = """You are playing a character named Vi. Here are some texts about Vi:
-        {"texts": "Once a criminal from the mean streets of Zaun, Vi is a hotheaded, impulsive, and fearsome woman with only a very loose respect for authority figures. Growing up all but alone, Vi developed finely honed survival instincts as well as a wickedly abrasive sense of humor. Now working with the Enforcers of Piltover to keep the peace, she wields mighty hextech gauntlets that can punch through walls and suspects with equal ease."}
-        Here is some context about the place where the scene takes place as well as summary of past events:
-        """ + context + """
-        
-        Complete the following short story as Vi:
-        """
-
+        contextsBook = {1: 'Piltover is a thriving, progressive city whose power and influence is on the rise. It is Valoran’s cultural center, where art, craftsmanship, trade and innovation walk hand in hand. Its power comes not through military might, but the engines of commerce and forward thinking. Situated on the cliffs above the district of Zaun and overlooking the ocean, fleets of ships pass through its titanic sea-gates, bringing goods from all over the world. The wealth this generates has given rise to an unprecedented boom in the city’s growth. Piltover has - and still is - reinventing itself as a city where fortunes can be made and dreams can be lived. Burgeoning merchant clans fund development in the most incredible endeavors: grand artistic follies, esoteric hextech research, and architectural monuments to their power. With ever more inventors delving into the emergent lore of hextech, Piltover has become a lodestone for the most skilled craftsmen the world over.',
+                        2: 'Located in Sidereal Avenue, the Ecliptic Vaults were once considered to be Piltover\'s most secure bank, before Jinx breached their heavily reinforced walls.',
+                        3: 'Zaun is a large, undercity district, lying in the deep canyons and valleys threading Piltover. What light reaches below is filtered through fumes leaking from the tangles of corroded pipework and reflected from the stained glass of its industrial architecture. Zaun and Piltover were once united, but are now separate, yet symbiotic societies. Though it exists in perpetual smogged twilight, Zaun thrives, its people vibrant and its culture rich. Piltover’s wealth has allowed Zaun to develop in tandem; a dark mirror of the city above. Many of the goods coming to Piltover find their way into Zaun’s black markets, and hextech inventors who find the restrictions placed upon them in the city above too restrictive often find their dangerous researches welcomed in Zaun. Unfettered development of volatile technologies and reckless industry has rendered whole swathes of Zaun polluted and dangerous. Streams of toxic runoff stagnate in the city’s lower reaches, but even here people find a way to exist and prosper.'}
         promptContext = """{\"context": \""""
 
         CONTEXT_SCENE_1 = "Rookie is a new enforcer trainee in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults without Rookie and investigate the scene since someone broke into the vault an hour ago."
@@ -95,10 +91,13 @@ def lambda_handler(event, _):
         #promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
         if location == LOCATION_1:
             promptContext += CONTEXT_SCENE_1
+            context = contextsBook[1]
         elif location == LOCATION_2:
             promptContext += CONTEXT_SCENE_2 
+            context = contextsBook[2]
         else:
             promptContext += CONTEXT_SCENE_3
+            context = contextsBook[3]
 
         promptStory = "\", \"story\": \""
 
@@ -130,6 +129,7 @@ def lambda_handler(event, _):
                 #promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
                 promptContext += CONTEXT_SCENE_2
                 doReset = True
+                context = contextsBook[2]
 
         elif location == LOCATION_2:
             controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"}'}. Are Vi and Rookie at the Lanes already? Answer 'Yes.' or 'No.'"""
@@ -144,6 +144,7 @@ def lambda_handler(event, _):
                 #promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
                 promptContext += CONTEXT_SCENE_3
                 doReset = True
+                context = contextsBook[3]
                 
         else:
             controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"}'}. Are Vi and Rookie in Shurima already? Answer 'Yes.' or 'No.'"""
@@ -158,6 +159,15 @@ def lambda_handler(event, _):
                 #promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
                 promptContext += CONTEXT_SCENE_1
                 doReset = True
+                context = contextsBook[1]
+
+        prompt = """You are playing a character named Vi. Here are some texts about Vi:
+                {"texts": "Once a criminal from the mean streets of Zaun, Vi is a hotheaded, impulsive, and fearsome woman with only a very loose respect for authority figures. Growing up all but alone, Vi developed finely honed survival instincts as well as a wickedly abrasive sense of humor. Now working with the Enforcers of Piltover to keep the peace, she wields mighty hextech gauntlets that can punch through walls and suspects with equal ease."}
+                Here is some context about the place where the scene takes place as well as summary of past events:
+                """ + context + """
+                
+                Complete the following short story as Vi:
+                """
 
         # check subquests
         subquests1 = {0: 'Has Rookie asked about the vaults?', 1: 'Has Rookie asked why is Vi going to the vaults?', 2: 'Has Rookie asked about the perpetrators?', 3: 'Has Rookie asked about the break-in?', 4: 'Has Rookie asked about the investigation?', 5: 'Has Rookie asked Vi to come with her?'}
