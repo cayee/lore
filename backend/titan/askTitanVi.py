@@ -105,9 +105,11 @@ def lambda_handler(event, _):
         # use previous messages
         previousUserMessages = msgHistory["questions"] + [query]
         previousViResponses = msgHistory["answers"] + [""]
+        """
         if location == LOCATION_1:
             previousUserMessages = ["Hi Vi! What's up?"] + previousUserMessages
             previousViResponses = ["Hey Rookie, I'm on official business. Don't distract me."] + previousViResponses
+        """
         dialogue = ""
         for q, a in zip(previousUserMessages, previousViResponses):
             dialogue += "Rookie: " + q + " Vi: " + a + " "
