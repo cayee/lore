@@ -117,7 +117,7 @@ def lambda_handler(event, _):
         controlReturn = "K"
         #check the region
         if location == LOCATION_1:
-            controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"}'}. Are Vi and Rookie at the Ecliptic Vaults already? Answer 'Yes.' or 'No.'"""
+            controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"}'}. Have Vi and Rookie reached the Ecliptic Vaults already? Answer 'Yes.' or 'No.'"""
             call_number = debug_count_call(call_number, 5)
             region_response = call_bedrock(bedrock, controlPrompt)
             controlReturn = "1_" + controlPrompt + "_" + region_response
@@ -182,19 +182,17 @@ def lambda_handler(event, _):
             promptQuests += """\", "story": \"""" + dialogue[:-5] + """\"}. There is a list of questions provided. Answer each question with a 'yes' or 'no', as an output provide a list. The list of questions:\nQuestions:\n"""
             for k, v in subquests1.items():
                 promptQuests += str(k+1) + ". " + v + '\n'
-            promptQuests += "Answers:\n"
         elif location == LOCATION_2:
             promptQuests += CONTEXT_SCENE_2
             promptQuests += """\", "story": \"""" + dialogue[:-5] + """\"}. There is a list of questions provided. Answer each question with a 'yes' or 'no', as an output provide a list. The list of questions:\nQuestions:\n"""
             for k, v in subquests2.items():
                 promptQuests += str(k+1) + ". " + v + '\n'
-            promptQuests += "Answers:\n"
         else:
             promptQuests += CONTEXT_SCENE_3
             promptQuests += """\", "story": \"""" + dialogue[:-5] + """\"}. There is a list of questions provided. Answer each question with a 'yes' or 'no', as an output provide a list. The list of questions:\nQuestions:\n"""
             for k, v in subquests3.items():
                 promptQuests += str(k+1) + ". " + v + '\n'
-            promptQuests += "Answers:\n"
+        promptQuests += "Answers:\n1. "
         print("Quests prompt:", promptQuests)
         call_number = debug_count_call(call_number, 5)
         generated_quest_ans = call_bedrock(bedrock, promptQuests)
