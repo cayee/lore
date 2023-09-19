@@ -244,7 +244,8 @@ def lambda_handler(event, _):
             call_number = debug_count_call(call_number, 5)
             summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{[' + promptStory[2:]+'"]}'}. Summarize the story.""")
             doReset = True
-
+        if generated_text == "":
+            generated_text = "..."
         answers.append({"answer": str(generated_text), "docs": doc_sources_string, "context": context, "prompt": prompt, "location": location, "control": controlReturn, "full_answer": fullAnswer, "summary": summary, 'quests': generated_quest_ans})
 
     resp_json = {"answers": answers}
