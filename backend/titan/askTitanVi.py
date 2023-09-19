@@ -114,63 +114,10 @@ def lambda_handler(event, _):
             dialogue += "Rookie: " + q + " Vi: " + a + " "
         promptStory += dialogue
 
-        controlReturn = "K"
-        #check the region
-        if location == LOCATION_1:
-            controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"}'}. Have Vi and Rookie reached the Ecliptic Vaults already? Answer 'Yes.' or 'No.'"""
-            call_number = debug_count_call(call_number, 5)
-            region_response = call_bedrock(bedrock, controlPrompt)
-            controlReturn = "1_" + controlPrompt + "_" + region_response
-            if "yes" in region_response.lower():
-                location = LOCATION_2
-                call_number = debug_count_call(call_number, 5)
-                #summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[3:]+'"}'}. Summarize the story.""")
-                promptContext = """{\"context": """
-                #promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
-                promptContext += CONTEXT_SCENE_2
-                doReset = True
-                context = contextsBook[2]
-
-        elif location == LOCATION_2:
-            controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"}'}. Are Vi and Rookie at the Lanes already? Answer 'Yes.' or 'No.'"""
-            call_number = debug_count_call(call_number, 5)
-            region_response = call_bedrock(bedrock, controlPrompt)
-            controlReturn = "2_" + controlPrompt + "_" + region_response
-            if "yes" in region_response.lower():
-                location = LOCATION_3
-                call_number = debug_count_call(call_number, 5)
-                #summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[3:]+'"}'}. Summarize the story.""")
-                promptContext = """{\"context": """
-                #promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
-                promptContext += CONTEXT_SCENE_3
-                doReset = True
-                context = contextsBook[3]
-                
-        else:
-            controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"}'}. Are Vi and Rookie in Shurima already? Answer 'Yes.' or 'No.'"""
-            call_number = debug_count_call(call_number, 5)
-            region_response = call_bedrock(bedrock, controlPrompt)
-            controlReturn = "3_" + controlPrompt + "_" + region_response
-            if "yes" in region_response.lower():
-                location = LOCATION_1
-                call_number = debug_count_call(call_number, 5)
-                #summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[3:]+'"}'}. Summarize the story.""")
-                promptContext = """{\"context": """
-                #promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
-                promptContext += CONTEXT_SCENE_1
-                doReset = True
-                context = contextsBook[1]
-
-        prompt = """You are playing a character named Vi. Here are some texts about Vi:
-                {"texts": "Once a criminal from the mean streets of Zaun, Vi is a hotheaded, impulsive, and fearsome woman with only a very loose respect for authority figures. Growing up all but alone, Vi developed finely honed survival instincts as well as a wickedly abrasive sense of humor. Now working with the Enforcers of Piltover to keep the peace, she wields mighty hextech gauntlets that can punch through walls and suspects with equal ease."}
-                Here is some context about the place where the scene takes place:
-                """ + context + """
-                Complete the following short story as Vi:
-                """
-
         # check subquests
-        subquests1 = {0: 'Has Rookie asked about the vaults?', 1: 'Has Rookie asked why is Vi going to the vaults?', 2: 'Has Rookie asked about the perpetrators?', 3: 'Has Rookie asked about the break-in?', 4: 'Has Rookie asked about who is helping in the investigation?', 5: 'Has Rookie asked Vi to come with her?'}
-        subanswers1 = {0: 'Noone is sure about what happened at the scene.', 1: '', 2: 'Noone knows who the perpetrators may be and Vi will doubt every claim about who might have done it.', 3: 'Noone was injured in a break-in but the perpetrators might still be around.', 4: 'Vi is the first and only enforcer dispatched in this investigation.', 5: 'Vi won\'t take Rookie with her unless Rookie proves they are strong enough by punching a tree hard enough. After that, Vi takes him to the vaults.'}
+        locationChange = False
+        subquests1 = {0: 'Has Rookie asked about the vaults?', 1: 'Has Rookie asked why is Vi going to the vaults?', 2: 'Has Rookie asked about the perpetrators?', 3: 'Has Rookie asked about the break-in?', 4: 'Has Rookie asked about who is helping in the investigation?', 5: 'Has Rookie asked Vi to come with her?', 6: 'Has Vi agreed to take Rookie with her?'}
+        subanswers1 = {0: 'Noone is sure about what happened at the scene.', 1: '', 2: 'Noone knows who the perpetrators may be and Vi will doubt every claim about who might have done it.', 3: 'Noone was injured in a break-in but the perpetrators might still be around.', 4: 'Vi is the first and only enforcer dispatched in this investigation.', 5: 'Vi won\'t take Rookie with her unless Rookie proves they are strong enough by punching a tree hard enough. After that, Vi takes him to the vaults.', 6: ''}
         subquests2 = {0: 'Has Rookie asked about the vaults?', 1: 'Has Rookie asked about the break-in?', 2: 'Has Rookie asked if anything has been stolen?', 3: 'Has anyone suggested looking for clues?', 4: 'Has Rookie asked about the blue graffiti?', 5: 'Has Vi told Rookie about Loxy?', 6: 'Has Rookie asked about the perpetrators?', 7: 'Has Rookie asked who might have broken in?', 8: 'Has Vi told Rookie about Zaun gangsters?'}
         subanswers2 = {0: '', 1: 'The thieves tried to break in but only managed to damage the building, they didn\'t steal anything.', 2: 'Nothing has been stolen from the Vaults.', 3: 'Vi and Rookie should look around for clues. There is a lot of junk lying around. Among them there is a piece of metal with blue graffiti on it.', 4: 'Although it is similiar to Jinx\'s style, Vi recognizes the graffiti to be Loxy\'s', 5: 'Loxy is a part of the Zaun gang known as Rawring Sparks and is the mastermind behind their operations.', 6: 'Vi suspects that the thieves might actually be the Zaun gangsters.', 7: 'Vi suspects that the thieves might actually be the Zaun gangsters.', 8: 'Rawring Sparks\' leader is Loxy. The Sparks have been causing a lot of mischief in Piltover lately.', 'Bonus1': 'Vi might suggest going to the Lanes to look for more information.'}
         subquests3 = {0: 'Has Rookie asked about what to do there?', 1: '', 2: '', 3: '', 4: '', 5: ''}
@@ -206,12 +153,69 @@ def lambda_handler(event, _):
                 completedQuests.add(i)
                 if location == LOCATION_1:
                     promptQuestBonus += " " + subanswers1[i]
+                    if set([6]) & completedQuests:
+                        locationChange = True
                 elif location == LOCATION_2:
                     promptQuestBonus += " " + subanswers2[i]
                     if set([4, 5, 6, 7]) & completedQuests:
                         promptQuestBonus += " " + subanswers2['Bonus1']
                 else:
                     promptQuestBonus += " " + subanswers3[i]
+
+
+        controlReturn = "K"
+        #check the region
+        if location == LOCATION_1:
+            controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"}'}. Have Vi and Rookie reached the Ecliptic Vaults already? Answer 'Yes.' or 'No.'"""
+            call_number = debug_count_call(call_number, 5)
+            region_response = call_bedrock(bedrock, controlPrompt)
+            controlReturn = "1_" + controlPrompt + "_" + region_response
+            if "yes" in region_response.lower() and locationChange:
+                location = LOCATION_2
+                call_number = debug_count_call(call_number, 5)
+                #summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[3:]+'"}'}. Summarize the story.""")
+                promptContext = """{\"context": """
+                #promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
+                promptContext += CONTEXT_SCENE_2
+                doReset = True
+                context = contextsBook[2]
+
+        elif location == LOCATION_2:
+            controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"}'}. Are Vi and Rookie at the Lanes already? Answer 'Yes.' or 'No.'"""
+            call_number = debug_count_call(call_number, 5)
+            region_response = call_bedrock(bedrock, controlPrompt)
+            controlReturn = "2_" + controlPrompt + "_" + region_response
+            if "yes" in region_response.lower() and locationChange:
+                location = LOCATION_3
+                call_number = debug_count_call(call_number, 5)
+                #summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[3:]+'"}'}. Summarize the story.""")
+                promptContext = """{\"context": """
+                #promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
+                promptContext += CONTEXT_SCENE_3
+                doReset = True
+                context = contextsBook[3]
+                
+        else:
+            controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory+'"}'}. Are Vi and Rookie in Shurima already? Answer 'Yes.' or 'No.'"""
+            call_number = debug_count_call(call_number, 5)
+            region_response = call_bedrock(bedrock, controlPrompt)
+            controlReturn = "3_" + controlPrompt + "_" + region_response
+            if "yes" in region_response.lower() and locationChange:
+                location = LOCATION_1
+                call_number = debug_count_call(call_number, 5)
+                #summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[3:]+'"}'}. Summarize the story.""")
+                promptContext = """{\"context": """
+                #promptContext = """{"summary": \"""" + summary + """\", """ + promptContext
+                promptContext += CONTEXT_SCENE_1
+                doReset = True
+                context = contextsBook[1]
+
+        prompt = """You are playing a character named Vi. Here are some texts about Vi:
+                {"texts": "Once a criminal from the mean streets of Zaun, Vi is a hotheaded, impulsive, and fearsome woman with only a very loose respect for authority figures. Growing up all but alone, Vi developed finely honed survival instincts as well as a wickedly abrasive sense of humor. Now working with the Enforcers of Piltover to keep the peace, she wields mighty hextech gauntlets that can punch through walls and suspects with equal ease."}
+                Here is some context about the place where the scene takes place:
+                """ + context + """
+                Complete the following short story as Vi:
+                """
         
         prompt += promptContext + promptQuestBonus + promptStory
         # beautify the response:
