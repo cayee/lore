@@ -8,21 +8,21 @@ is_cold_start = True
 bedrock = None
 vectorstores = []
 session = None
+doReset = False
+startTime = 0
+summary = ""
+LOCATION_1 = "Piltover plaza"
+LOCATION_2 = "Ecliptic Vaults"
+LOCATION_3 = "the Lanes"
 
-def initConsts():
-    LOCATION_1 = "Piltover plaza"
-    LOCATION_2 = "Ecliptic Vaults"
-    LOCATION_3 = "the Lanes"
+CONTEXT_SCENE_1 = "Rookie is a new enforcer trainee in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults alone and investigate the scene since someone broke into the vault an hour ago. Vi won't take Rookie with her but will answer his questions."
+CONTEXT_SCENE_2 = "Right now Rookie and Vi are at the Ecliptic Vaults. Rookie and Vi can't go inside the vaults as they were damaged in an attempted break-in and might collapse any minute. Vi and Rookie should look around for clues in order to solve the case."
+CONTEXT_SCENE_3 = "Rookie and Vi arrive to the Lanes in Zaun. Vi suggests going to the local bar 'The Last Crop' to ask locals for some information regarding 'Rawring Sparks'."
 
-    CONTEXT_SCENE_1 = "Rookie is a new enforcer trainee in piltovian police force. Rookie meets Vi at the plaza in Piltover. Vi was ordered to go to the Ecliptic Vaults alone and investigate the scene since someone broke into the vault an hour ago. Vi won't take Rookie with her but will answer his questions."
-    CONTEXT_SCENE_2 = "Right now Rookie and Vi are at the Ecliptic Vaults. Rookie and Vi can't go inside the vaults as they were damaged in an attempted break-in and might collapse any minute. Vi and Rookie should look around for clues in order to solve the case."
-    CONTEXT_SCENE_3 = "Rookie and Vi arrive to the Lanes in Zaun. Vi suggests going to the local bar 'The Last Crop' to ask locals for some information regarding 'Rawring Sparks'."
-
-    contextsBook = {1: 'Piltover is a thriving, progressive city whose power and influence is on the rise. It is Valoran’s cultural center, where art, craftsmanship, trade and innovation walk hand in hand. Its power comes not through military might, but the engines of commerce and forward thinking. Situated on the cliffs above the district of Zaun and overlooking the ocean, fleets of ships pass through its titanic sea-gates, bringing goods from all over the world. The wealth this generates has given rise to an unprecedented boom in the city’s growth. Piltover has - and still is - reinventing itself as a city where fortunes can be made and dreams can be lived. Burgeoning merchant clans fund development in the most incredible endeavors: grand artistic follies, esoteric hextech research, and architectural monuments to their power. With ever more inventors delving into the emergent lore of hextech, Piltover has become a lodestone for the most skilled craftsmen the world over.',
-                    2: 'Located in Sidereal Avenue, the Ecliptic Vaults were once considered to be Piltover\'s most secure bank, before Jinx breached their heavily reinforced walls.',
-                    3: 'Zaun is a large, undercity district, lying in the deep canyons and valleys threading Piltover. What light reaches below is filtered through fumes leaking from the tangles of corroded pipework and reflected from the stained glass of its industrial architecture. Zaun and Piltover were once united, but are now separate, yet symbiotic societies. Though it exists in perpetual smogged twilight, Zaun thrives, its people vibrant and its culture rich. Piltover’s wealth has allowed Zaun to develop in tandem; a dark mirror of the city above. Many of the goods coming to Piltover find their way into Zaun’s black markets, and hextech inventors who find the restrictions placed upon them in the city above too restrictive often find their dangerous researches welcomed in Zaun. Unfettered development of volatile technologies and reckless industry has rendered whole swathes of Zaun polluted and dangerous. Streams of toxic runoff stagnate in the city’s lower reaches, but even here people find a way to exist and prosper.'}
-
-    return LOCATION_1, LOCATION_2, LOCATION_3, CONTEXT_SCENE_1, CONTEXT_SCENE_2, CONTEXT_SCENE_3, contextsBook
+contextsBook = {1: 'Piltover is a thriving, progressive city whose power and influence is on the rise. It is Valoran’s cultural center, where art, craftsmanship, trade and innovation walk hand in hand. Its power comes not through military might, but the engines of commerce and forward thinking. Situated on the cliffs above the district of Zaun and overlooking the ocean, fleets of ships pass through its titanic sea-gates, bringing goods from all over the world. The wealth this generates has given rise to an unprecedented boom in the city’s growth. Piltover has - and still is - reinventing itself as a city where fortunes can be made and dreams can be lived. Burgeoning merchant clans fund development in the most incredible endeavors: grand artistic follies, esoteric hextech research, and architectural monuments to their power. With ever more inventors delving into the emergent lore of hextech, Piltover has become a lodestone for the most skilled craftsmen the world over.',
+                2: 'Located in Sidereal Avenue, the Ecliptic Vaults were once considered to be Piltover\'s most secure bank, before Jinx breached their heavily reinforced walls.',
+                3: 'Zaun is a large, undercity district, lying in the deep canyons and valleys threading Piltover. What light reaches below is filtered through fumes leaking from the tangles of corroded pipework and reflected from the stained glass of its industrial architecture. Zaun and Piltover were once united, but are now separate, yet symbiotic societies. Though it exists in perpetual smogged twilight, Zaun thrives, its people vibrant and its culture rich. Piltover’s wealth has allowed Zaun to develop in tandem; a dark mirror of the city above. Many of the goods coming to Piltover find their way into Zaun’s black markets, and hextech inventors who find the restrictions placed upon them in the city above too restrictive often find their dangerous researches welcomed in Zaun. Unfettered development of volatile technologies and reckless industry has rendered whole swathes of Zaun polluted and dangerous. Streams of toxic runoff stagnate in the city’s lower reaches, but even here people find a way to exist and prosper.'}
+call_number = 0
 
 def debug_count_call(n, sleep):
     time.sleep(sleep)
@@ -30,8 +30,7 @@ def debug_count_call(n, sleep):
     return n+1
 
 def extractFromBody(event):
-    log_questions = False
-    doReset = False
+    global doReset, log_questions
     body = {}
     clientSessId = ''
     context = ''
@@ -77,10 +76,9 @@ def startSession(event, clientSessId):
     summary = msgHistory["summary"] if msgHistory["summary"] != None else ""
     print(f"After session load: {time.time() - startTime}")
     call_number = 0
-    return location, summary, call_number
+    return location, summary, msgHistory
 
-def createContext(location):
-    global contextsBook
+def createContext(location, contextsBook):
     global LOCATION_1, LOCATION_2, LOCATION_3
     global CONTEXT_SCENE_1, CONTEXT_SCENE_2, CONTEXT_SCENE_3
 
@@ -97,10 +95,7 @@ def createContext(location):
         context = contextsBook[3]
     return promptContext, context
 
-def createDialogue():
-    global msgHistory
-    global query
-
+def createDialogue(query, msgHistory):
     previousUserMessages = msgHistory["questions"] + [query]
     previousViResponses = msgHistory["answers"] + [""]
     dialogue = ""
@@ -164,10 +159,9 @@ def checkQuests(dialogue, location):
                 promptQuestBonus += " " + subanswers3[i]
     return location, locationChange, promptQuestBonus, generated_quest_ans
 
-def checkCurrentRegion(newLocation, newContext, newContextBook):
+def checkCurrentRegion(newLocation, newContext, newContextBook, promptStory, locationChange):
     global call_number
-    global promptContext, promptStory
-    global locationChange
+    global promptContext
 
     controlPrompt = f"""This is the story of Rookie and Vi with some context in JSON format: {promptContext + promptStory + '"}'}. Have Vi and Rookie reached the Ecliptic Vaults already? Answer 'Yes.' or 'No.'"""
     call_number = debug_count_call(call_number, 5)
@@ -180,10 +174,8 @@ def checkCurrentRegion(newLocation, newContext, newContextBook):
         #summary = call_bedrock(bedrock, f"""This is the story of Rookie and Vi with some context in JSON format: {'{' + promptStory[3:]+'"}'}. Summarize the story.""")
         promptContext = """{\"context": """
         promptContext += newContext
-        context = newContextBook
         doReset = True
-    if doReset:
-        return doReset, [location, promptContext, context, controlReturn]
+        return doReset, [location, promptContext, newContextBook, controlReturn]
     return False, []
 
 def askVi(bedrock, prompt):
@@ -199,10 +191,9 @@ def askVi(bedrock, prompt):
     print({"bedrockStartTime": bedrockStartTime, "bedrockEndTime": bedrockEndTime, "bedrockCallTime": bedrockEndTime - bedrockStartTime, "promptLength": len(prompt), "prompt": prompt})
     return generated_text
 
-def clearAnswer(generated_text):
-    global location
+def clearAnswer(generated_text, location, promptStory):
     global LOCATION_1, LOCATION_2, LOCATION_3
-    global promptStory, summary, doReset
+    global summary, doReset
 
     # cut everything out after the first 'Rookie' appearance
     fullAnswer = generated_text
@@ -226,10 +217,9 @@ def clearAnswer(generated_text):
         generated_text = "..."
     return generated_text, summary, doReset
 
-def saveSession(answers):
+def saveSession(answers, query, location, log_questions):
     global startTime
-    global session
-    global log_questions, query, doReset
+    global session, summary
     generated_text = answers["answer"]
     summary = answers["summary"]
 
@@ -243,6 +233,7 @@ def saveSession(answers):
     print(f"After session put: {time.time() - startTime}")
 
 def lambda_handler(event, _):
+    global doReset, startTime, call_number
     startTime = time.time()
     print(f"Start time: {time.time() - startTime}")
     
@@ -252,15 +243,13 @@ def lambda_handler(event, _):
     else:
         return info
 
-    location, summary, call_number = startSession(event, clientSessId)
+    location, summary, msgHistory = startSession(event, clientSessId)
 
-    LOCATION_1, LOCATION_2, LOCATION_3, CONTEXT_SCENE_1, CONTEXT_SCENE_2, CONTEXT_SCENE_3, contextsBook = initConsts()
-
-    promptContext, context = createContext(location)
+    promptContext, context = createContext(location, contextsBook)
 
     promptStory = "\", \"story\": \""
     # use previous messages
-    dialogue = createDialogue()
+    dialogue = createDialogue(query, msgHistory)
     promptStory += dialogue
 
     # check subquests
@@ -269,14 +258,14 @@ def lambda_handler(event, _):
     controlReturn = ""
     #check the region
     if location == LOCATION_1:
-        isNew, info = checkCurrentRegion(LOCATION_2, CONTEXT_SCENE_2, contextsBook[2])
+        isNew, info = checkCurrentRegion(LOCATION_2, CONTEXT_SCENE_2, contextsBook[2], promptStory, locationChange)
     elif location == LOCATION_2:
-        isNew, info = checkCurrentRegion(LOCATION_3, CONTEXT_SCENE_3, contextsBook[3])           
+        isNew, info = checkCurrentRegion(LOCATION_3, CONTEXT_SCENE_3, contextsBook[3], promptStory, locationChange)
     else:
-        isNew, info = checkCurrentRegion(LOCATION_1, CONTEXT_SCENE_1, contextsBook[1])
+        isNew, info = checkCurrentRegion(LOCATION_1, CONTEXT_SCENE_1, contextsBook[1], promptStory, locationChange)
 
     if isNew:
-            doReset, [location, promptContext, context, controlReturn] = True, info
+        doReset, [location, promptContext, context, controlReturn] = True, info
 
 
     prompt = """You are playing a character named Vi. Here are some texts about Vi:
@@ -291,11 +280,11 @@ def lambda_handler(event, _):
     generated_text = askVi(bedrock, prompt)
     # beautify the response
     fullAnswer = generated_text
-    generated_text. summary, doReset = clearAnswer(generated_text)
+    generated_text, summary, doReset = clearAnswer(generated_text, location, promptStory)
     
     answers = {"answer": str(generated_text), "context": context, "prompt": prompt, "location": location, "control": controlReturn, "full_answer": fullAnswer, "summary": summary, 'quests': generated_quest_ans}
 
-    saveSession(answers)
+    saveSession(answers, query, location, log_questions)
     resp_json = {answers}
     return {
         'statusCode': 200,
