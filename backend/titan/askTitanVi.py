@@ -187,6 +187,7 @@ def askVi(bedrock, prompt):
     bedrockStartTime = time.time() - startTime
     print(f"Before bedrock call: {bedrockStartTime}")
     call_number = debug_count_call(call_number, 5)
+    print(f"Prompt3: {prompt}")
     generated_text = call_bedrock(bedrock, prompt)
     bedrockEndTime = time.time() - startTime
     print(f"After bedrock call: {bedrockEndTime}")
@@ -287,7 +288,7 @@ def lambda_handler(event, _):
     answers = {"answer": str(generated_text), "context": context, "prompt": prompt, "location": location, "control": controlReturn, "full_answer": fullAnswer, "summary": summary, 'quests': generated_quest_ans}
 
     saveSession(answers, query, location, log_questions)
-    resp_json = {answers}
+    resp_json = answers
     return {
         'statusCode': 200,
         'body': json.dumps(resp_json)
