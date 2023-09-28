@@ -90,8 +90,8 @@ function handleViResponse() {
         answer = `Not allowed ${this.status}`;
     } else if (this.status === 200) {
         let response = JSON.parse(this.response);
-        answer = response.answers[0].answer;
-        storyLocation = response.answers[0].location
+        answer = response.answer;
+        storyLocation = response.location
     }
     else if (this.status === 429) {
         answer = "Rate limited";
@@ -118,7 +118,7 @@ function ask2() {
     hourglassVi.style.display = "inline";
     insertMsg(msgBotVi, question, chatVi);
 
-    postAsk("AskVi", {"query": question, "logQuestions": logQs.checked, "resetChat": false, "sessId": "Vi"}, handleViResponse)
+    postAsk("AskVi", {"query": question, "logQuestions": logQs.checked, "resetChat": false, "sessId": "Vii"}, handleViResponse)
 }
 
 function askViAgain() {
