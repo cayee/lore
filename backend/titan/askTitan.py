@@ -183,7 +183,7 @@ def lambda_handler(event, _):
     session.reset(False)
     print(f"expr: {session.update_expression}")
     if "Sorry - this model" not in generated_text:
-        session.put(query, answers, str(msgHistory["location"]), str(qNumber))
+        session.put(query, answers[0], str(msgHistory["location"]), str(qNumber))
     print(f"After session put: {time.time() - startTime}")
     return {
         'statusCode': 200,
