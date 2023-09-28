@@ -26,7 +26,7 @@ call_number = 0
 promptContext = ""
 
 def debug_count_call(n, sleep):
-    time.sleep(sleep)
+    #time.sleep(sleep)
     print("call_number:", n+1)
     return n+1
 
