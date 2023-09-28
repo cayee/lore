@@ -109,6 +109,7 @@ def createQuestPrompt(subquests, context, dialogue):
     promptQuests += """\", "story": \"""" + dialogue[:-5] + """\"}. There is a list of questions provided. Answer each question with a 'yes' or 'no', as an output provide a list. The list of questions:\nQuestions:\n"""
     for k, v in subquests.items():
         promptQuests += str(k+1) + ". " + v + '\n'
+    return promptQuests
 
 def checkQuests(dialogue, location):
     global call_number
