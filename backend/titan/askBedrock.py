@@ -5,9 +5,9 @@ import boto3
 from langchain.embeddings import BedrockEmbeddings
 from langchain.vectorstores import FAISS
 
-modelId = "amazon.titan-text-express-v1"
+modelId = "amazon.titan-text-lite-v1"
 textGenerationConfig = {
-    "maxTokenCount": 8192,
+    "maxTokenCount": 4096,#3072-agile
     "stopSequences": [],
     "temperature": 0.0,
     "topP": 0.2,
