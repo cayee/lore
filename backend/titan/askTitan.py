@@ -41,7 +41,7 @@ def lambda_handler(event, _):
     if is_cold_start:
         bedrock, vectorstores = connectToBedrock([#{"index": "/opt/index_faiss", "model": "amazon.titan-e1t-medium"},
                                                   #{"index": "/opt/index_faiss_5_embv2", "model": "amazon.titan-embed-g1-text-02"},
-                                                  {"index": "/opt/index_faiss_10_embv2", "model": "amazon.titan-embed-g1-text-02"}])
+                                                  {"index": "/opt/index_faiss_10_embv2", "model": "amazon.titan-embed-text-v1"}])
         session = ChatSessionLocation()
         is_cold_start = False
 
@@ -183,7 +183,7 @@ def lambda_handler(event, _):
     session.reset(False)
     print(f"expr: {session.update_expression}")
     if "Sorry - this model" not in generated_text:
-        session.put(query, answers, str(msgHistory["location"]), str(qNumber))
+        session.put(query, answers[0], str(msgHistory["location"]), str(qNumber))
     print(f"After session put: {time.time() - startTime}")
     return {
         'statusCode': 200,

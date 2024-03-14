@@ -5,15 +5,13 @@ import boto3
 from langchain.embeddings import BedrockEmbeddings
 from langchain.vectorstores import FAISS
 
-modelId = "amazon.titan-tg1-xlarge"
+modelId = "amazon.titan-text-lite-v1"
 textGenerationConfig = {
-    "maxTokenCount": 3072,
+    "maxTokenCount": 4096,#3072-agile
     "stopSequences": [],
     "temperature": 0.0,
     "topP": 0.2,
 }
-
-#"amazon.titan-tg1-xlarge", "maxTokenCount": 8192
 
 def call_bedrock(bedrock_client, prompt, model = modelId):
     prompt_config = {
@@ -36,18 +34,9 @@ def call_bedrock(bedrock_client, prompt, model = modelId):
 
 
 def connectToBedrock(indexes):
-    roleArn = os.environ["titanRoleArn"]
-    sts = boto3.client('sts')
-
-    resp = sts.assume_role(RoleArn=roleArn, RoleSessionName="TitanAccessFromLambda", DurationSeconds=3600)
-
-    bedrock = boto3.client(aws_access_key_id=resp['Credentials']['AccessKeyId'],
-                           aws_secret_access_key=resp['Credentials']['SecretAccessKey'],
-                           aws_session_token=resp['Credentials']['SessionToken'],
-                           service_name="bedrock",
+    bedrock = boto3.client(service_name="bedrock-runtime",
                            region_name="us-west-2",
-                           endpoint_url="https://prod.us-west-2.frontend.bedrock.aws.dev",
-                           # endpoint_url="https://bedrock.us-east-1.amazonaws.com",
+                           endpoint_url="https://prod.us-west-2.dataplane.bedrock.aws.dev"
                            )
     vectorstores = [FAISS.load_local(index["index"], BedrockEmbeddings(client=bedrock, model_id=index["model"]))
                     for index in indexes]

@@ -118,7 +118,7 @@ class ChatSession(DDBsessionJWT):
 
     def put(self, query, answers):
         self.expression_attribute_values[':query'] = {"L": [{"S": query}]}
-        self.expression_attribute_values[':answer'] = {"L": [{"S": answers[0]["answer"]}]}
+        self.expression_attribute_values[':answer'] = {"L": [{"S": answers["answer"]}]}
         super().put()
 
     def load(self):
