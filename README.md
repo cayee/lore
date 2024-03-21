@@ -1,3 +1,7 @@
+![](readme1.png)
+
+![](readme2.png)
+
 # Loremaster & Vi adventure on bedrock
 The project's goal was to use AWS Bedrock to create an interactive experience for League of Legends fans. The
 idea was to use GenAI to provide unique responses in a conversation that player would be having with one of the
